@@ -1,0 +1,20 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Aug 5, 2016, 4:44:13 PM
+    Author     : SCC
+*/
+// directories - set to web, android, or ios. These are in the hybrid/www folder
+//----------------------------------
+//$imageDir: "../android/css/libs/oj/v2.0.1/alta/images/";
+//$commonImageDir: "libs/common/images";
+//$fontDir: "../android/css/libs/oj/v2.0.1/alta/fonts/";
+// theme config settings
+
+@import "myCustomSettings";
+// import main alta scss file set to web, android, or ios. This example is pointing to the bower_component folder.
+ @import "../../bower_components/oraclejet/dist/scss/alta-android/oj-alta";
+ @import "demo-grid";

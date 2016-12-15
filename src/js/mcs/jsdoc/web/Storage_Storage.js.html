@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Oracle Mobile Cloud Service JavaScript SDK for Browsers Reference, Release: 16.2.3.0, E76062-01 Source: Storage/Storage.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.paper.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">Oracle Mobile Cloud Service JavaScript SDK for Browsers Reference, Release: 16.2.3.0, E76062-01</a>
+	</div>
+	<div class="navbar-collapse">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="mcs.html">mcs</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="Analytics.html">Analytics</a></li><li><a href="AnalyticsEvent.html">AnalyticsEvent</a></li><li><a href="Authorization.html">Authorization</a></li><li><a href="BasicAuthorization.html">BasicAuthorization</a></li><li><a href="BrowserPlatform.html">BrowserPlatform</a></li><li><a href="CustomCode.html">CustomCode</a></li><li><a href="Diagnostics.html">Diagnostics</a></li><li><a href="mcs.MobileBackendManager.html">mcs.MobileBackendManager</a></li><li><a href="MobileBackend.html">MobileBackend</a></li><li><a href="OAuthAuthorization.html">OAuthAuthorization</a></li><li><a href="Platform.html">Platform</a></li><li><a href="Storage.html">Storage</a></li><li><a href="StorageCollection.html">StorageCollection</a></li><li><a href="StorageObject.html">StorageObject</a></li><li><a href="User.html">User</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+	</div>
+</div>
+</div>
+
+
+<div class="container">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+			
+
+		<h1 class="page-title">Source: Storage/Storage.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">"use strict";
+
+/**
+ * Class that provides cloud based storage capabilities. Callers should use
+ * MobileBackend's [Storage()]{@link MobileBackend#Storage} property.
+ * @constructor
+ */
+function Storage(backend) {
+
+  /**
+   * The [MobileBackend]{@link MobileBackend} object that this Storage instance belongs to.
+   * @type {MobileBackend}
+   * @readonly
+   */
+  this.backend = backend;
+
+  var storage = this;
+
+  /**
+   * Callback invoked after successfully fetching a StorageCollection.
+   * @callback Storage~getCollectionSuccessCallback
+   * @param storageCollection {StorageCollection} The downloaded StorageCollection instance.
+   */
+
+  /**
+   * Callback invoked on error.
+   * @callback Storage~errorCallback
+   * @param statusCode {Number} Any HTTP status code returned from the server, if available.
+   * @param message {String} The HTTP payload from the server, if available, or an error message.
+   */
+
+  /**
+   * Returns a StorageCollection with the given name from the service associated with the user. Subsequent accesses to StorageObjects in the
+   * StorageCollection will only return StorageObjects owned by the user.
+   * @param name {String} The name of the StorageCollection.
+   * @example name: "JSCollection"
+   * @param userId {String} Optional, the ID of the user retrieved from the UI.
+   * @example userId: "e8671189-585d-478e-b437-005b7632b8803"
+   * @param successCallback {Storage~getCollectionSuccessCallback} Callback invoked on success.
+   * @param errorCallback {Storage~errorCallback} Callback invoked on error.
+   */
+  this.getCollection = function(name, userId, successCallback, errorCallback) {
+
+    var headers = storage.backend.getHttpHeaders();
+    headers["Accept"] = "application/json";
+    headers["Accept-Encoding"] = "gzip";
+
+    mcs.MobileBackendManager.platform.invokeService({
+      method: 'GET',
+      url: storage.backend.getPlatformUrl("storage/collections/" + mcs._Utils.validateConfiguration(name)),
+      headers: headers,
+
+      success: function(response, data) {
+        if(successCallback != null) {
+          successCallback(new mcs._StorageCollection(data, mcs._Utils.validateConfiguration(userId), storage));
+        }
+      },
+      error: function(statusCode, data) {
+        if(errorCallback != null) {
+          errorCallback(statusCode, data);
+        }
+      }
+    });
+  };
+}
+
+(function() {
+  var g = typeof window != 'undefined' ? window : global;
+
+  g.mcs = g.mcs || {};
+  g.mcs._Storage = Storage;
+}());
+</pre>
+    </article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+
+<footer>
+
+
+	<span class="copyright">
+	<center>Copyright &copy 2016, Oracle and/or its affiliates. All rights reserved.<center>
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+	on Thu Jun 23rd 2016 using the <a
+	href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<!--<script src="scripts/sunlight.js"></script>-->
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/bootstrap-dropdown.js"></script>
+<script src="scripts/toc.js"></script>
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
+		},
+		selectors   : "h1,h2,h3,h4",
+		showAndHide : false,
+                navbarOffset: 10,
+		smoothScrolling: true
+	} );
+
+	$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+	//			$( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
+
+  $( "table" ).each( function () {
+    var $this = $( this );
+    $this.addClass('table');
+  } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+</body>
+</html>

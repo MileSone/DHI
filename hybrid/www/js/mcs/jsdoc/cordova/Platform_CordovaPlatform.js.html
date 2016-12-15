@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Oracle Mobile Cloud Service JavaScript SDK for Cordova Reference, Release: 16.2.3.0, E76063-01 Source: Platform/CordovaPlatform.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.paper.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">Oracle Mobile Cloud Service JavaScript SDK for Cordova Reference, Release: 16.2.3.0, E76063-01</a>
+	</div>
+	<div class="navbar-collapse">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="mcs.html">mcs</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="Analytics.html">Analytics</a></li><li><a href="AnalyticsEvent.html">AnalyticsEvent</a></li><li><a href="Authorization.html">Authorization</a></li><li><a href="BasicAuthorization.html">BasicAuthorization</a></li><li><a href="BrowserPlatform.html">BrowserPlatform</a></li><li><a href="CordovaPlatform.html">CordovaPlatform</a></li><li><a href="CustomCode.html">CustomCode</a></li><li><a href="Diagnostics.html">Diagnostics</a></li><li><a href="FacebookAuthorization.html">FacebookAuthorization</a></li><li><a href="mcs.MobileBackendManager.html">mcs.MobileBackendManager</a></li><li><a href="MobileBackend.html">MobileBackend</a></li><li><a href="Notifications.html">Notifications</a></li><li><a href="OAuthAuthorization.html">OAuthAuthorization</a></li><li><a href="Platform.html">Platform</a></li><li><a href="SSOAuthorization.html">SSOAuthorization</a></li><li><a href="Storage.html">Storage</a></li><li><a href="StorageCollection.html">StorageCollection</a></li><li><a href="StorageObject.html">StorageObject</a></li><li><a href="User.html">User</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="global.html#IsInAppBrowserInstalled">IsInAppBrowserInstalled</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+	</div>
+</div>
+</div>
+
+
+<div class="container">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+			
+
+		<h1 class="page-title">Source: Platform/CordovaPlatform.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">"use strict";
+
+//
+// Needs to have console, geolocation, PushPlugin, sqlite-storage and device plugins to be installed.
+//
+
+/**
+ * Platform class for Cordova applications. Derives from [BrowserPlatform]{@link BrowserPlatform}.
+ * @constructor
+ */
+var CordovaPlatform = function() {
+
+  this.isBrowser = false;
+
+  this.isCordova = true;
+
+  this._latitude = null;
+  this._longitude = null;
+
+  var cordovaPlatform = this;
+  navigator.geolocation.watchPosition(function (position) {
+    cordovaPlatform._latitude = position.coords.latitude;
+    cordovaPlatform._longitude = position.coords.longitude;
+  });
+
+  /**
+   * Overrides [Platform.getGPSLocation()]{@link Platform#getGPSLocation}
+   * @override
+   */
+  this.getGPSLocation = function () {
+    return {
+      "latitude": "" + this._latitude,
+      "longitude": "" + this._longitude
+    };
+  };
+
+  /**
+   * Checks the current state of the device. Platform implementations should call this function
+   * when the state changes. The state is inspected before background operations
+   * like synchronization are performed.
+   * Cordova Network Information Plugin MUST be installed for this function to operate.
+   */
+  this.checkConnection = function () {
+    var networkState = navigator.connection.type;
+
+    var states = {};
+    states[Connection.UNKNOWN] = 'Unknown connection';
+    states[Connection.ETHERNET] = 'Ethernet connection';
+    states[Connection.WIFI] = 'WiFi connection';
+    states[Connection.CELL_2G] = 'Cell 2G connection';
+    states[Connection.CELL_3G] = 'Cell 3G connection';
+    states[Connection.CELL_4G] = 'Cell 4G connection';
+    states[Connection.CELL] = 'Cell generic connection';
+    states[Connection.NONE] = 'No network connection';
+
+    mcs._Logger.log(mcs.logLevelInfo, 'Connection type: ' + states[networkState]);
+    return states[networkState];
+  };
+
+  /**
+   @return Returns an object of variables use to return device specific information like:
+
+   @return model: Nexus One returns "Passion", Motorola Droid  returns "voles", etc.
+   *
+   @return manufacturer: Returns the manufacturer name:
+   *
+   * Samsung
+   * LG
+   * Motorola
+   * Micosoft
+   * Sony
+   * Apple
+   *
+   @return OS Name: Depending on the device, a few examples are:
+   * "Android"
+   * "BlackBerry 10"
+   * Browser:         returns "MacIntel" on Mac
+   *                  returns "Win32" on Windows
+   * "iOS"
+   * "WinCE"
+   * "Tizen"
+   *
+   @return OS Version: Depending on the device, a few examples are:
+   * Android:    Froyo OS would return "2.2"
+   Eclair OS would return "2.1", "2.0.1", or "2.0"
+   Version can also return update level "2.1-update1"
+
+   * BlackBerry: Torch 9800 using OS 6.0 would return "6.0.0.600"
+   *
+   * Browser:    Returns version number for the browser
+
+   * iPhone:     iOS 3.2 returns "3.2"
+   * Windows Phone 7: returns current OS version number, ex. on Mango returns 7.10.7720
+   * Tizen: returns "TIZEN_20120425_2"
+   *
+   @return OS Build: Get the version of Cordova running on the device.
+   * Overrides [Platform.getDeviceInformation()]{@link Platform#getDeviceInformation}
+   * @override
+   */
+  this.getDeviceInformation = function () {
+
+    if (typeof device == "undefined") {
+      return {
+        "model": "&lt;unknown>",
+        "manufacturer": "&lt;unknown>",
+        "osName": "&lt;unknown>",
+        "osVersion": "&lt;unknown>",
+        "osBuild": "&lt;unknown>",
+        "carrier": "&lt;unknown>"
+      }
+    }
+    else {
+      return {
+        "model": device.model,
+        "manufacturer": device.manufacturer,
+        "osName": device.platform,
+        "osVersion": device.version,
+        "osBuild": "cordova " + device.cordova,
+        "carrier": "&lt;unknown>"
+      }
+    }
+  }
+};
+
+
+(function() {
+
+  CordovaPlatform.prototype = new mcs.BrowserPlatform();
+
+  var g = typeof window != 'undefined' ? window : global;
+  g.mcs = g.mcs || {};
+
+  g.mcs.CordovaPlatform = CordovaPlatform;
+}());
+</pre>
+    </article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+
+<footer>
+
+
+	<span class="copyright">
+	<center>Copyright &copy 2016, Oracle and/or its affiliates. All rights reserved.<center>
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+	on Thu Jun 23rd 2016 using the <a
+	href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<!--<script src="scripts/sunlight.js"></script>-->
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/bootstrap-dropdown.js"></script>
+<script src="scripts/toc.js"></script>
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
+		},
+		selectors   : "h1,h2,h3,h4",
+		showAndHide : false,
+                navbarOffset: 10,
+		smoothScrolling: true
+	} );
+
+	$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+	//			$( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
+
+  $( "table" ).each( function () {
+    var $this = $( this );
+    $this.addClass('table');
+  } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+</body>
+</html>

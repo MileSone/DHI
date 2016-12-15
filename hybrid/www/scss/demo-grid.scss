@@ -1,0 +1,235 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 2016-8-8, 12:17:41
+    Author     : xh
+*/
+@import "../../bower_components/oraclejet/dist/scss/alta/oj.alta.variables";
+@import "../../bower_components/oraclejet/dist/scss//utilities/oj.utilities.bidi";
+@import "../../bower_components/oraclejet/dist/scss//utilities/oj.utilities.prefix";
+
+$demoGridSmallColor: hsl(17, 60%, 77%); // hsl(200, 100%, 95%);// old color: lightcyan;
+$demoGridMediumColor: hsl(200, 80%, 87%);// old color: LightGoldenRodYellow ;
+$demoGridLargeColor: hsl(200, 60%, 77%);// old color: lavenderblush;
+$demoGridXlargeColor: hsl(200, 40%, 65%);// old color: lavender;
+$demoGridPrintColor: #BEEBCC;
+
+
+.demo-flex-display > .oj-flex,
+.demo-flex-display.oj-flex,
+.demo-flex-display > .oj-row,
+.demo-flex-display.oj-row,
+.demo-flex-display > .oj-flex-bar { 
+  background: #eee; 
+  margin-bottom: 5px; 
+}
+
+.demo-noresponsive-display,
+.demo-responsive-display,
+.demo-flex-display .oj-col,
+.demo-flex-display .oj-flex-item,
+.demo-flex-display .oj-flex-bar-start,
+.demo-flex-display .oj-flex-bar-middle,
+.demo-flex-display .oj-flex-bar-end,
+.demo-flex-display .oj-flex-bar-center-absolute { 
+  background: blanchedalmond; 
+  border: 1px solid #bbb; 
+  font-weight: bold;  
+  font-size: 1.1rem; 
+  line-height: 2rem }
+
+
+.demo-flex-display > .oj-flex-bar {
+  margin-top: 20px;
+}
+
+.demo-grid-sizes .oj-flex > * { 
+     background: floralwhite; 
+     border-color: #ddd; }
+
+.demo-grid-sizes  .oj-flex > *:before { 
+     content: "\00a0"; }
+
+
+.demo-noresponsive-display,
+.demo-responsive-display {
+  margin-bottom: 3px;
+  padding: 0px 5px;
+  @include oj-box-sizing-property(border-box);
+}
+
+%demoGridLegend {
+  height: 1em;
+  width: 1em;
+  display:inline-block;
+  @include oj-box-sizing-property(border-box);
+  border: 1px solid black;
+}
+
+.demo-grid-legend-small {
+  @extend %demoGridLegend;
+  background-color: $demoGridSmallColor;
+}
+.demo-grid-legend-medium {
+  @extend %demoGridLegend;
+  background-color: $demoGridMediumColor;
+}
+.demo-grid-legend-large {
+  @extend %demoGridLegend;
+  background-color: $demoGridLargeColor;
+}
+.demo-grid-legend-xlarge {
+  @extend %demoGridLegend;
+  background-color: $demoGridXlargeColor;
+}
+.demo-grid-legend-print {
+  @extend %demoGridLegend;
+  background-color: $demoGridPrintColor;
+}
+
+.demo-grid-legend > div {
+  display:inline-block;
+  padding-right: 20px;
+}
+
+
+.demo-grid-range { 
+     font-weight: bold;
+     font-size: 1.3em; }
+
+
+.demo-flex-display .oj-flex-item[class*="order"]:nth-child(1)
+{
+  background-color: $demoGridSmallColor;
+}
+
+.demo-flex-display .oj-flex-item[class*="order"]:nth-child(2)
+{
+  background-color: $demoGridMediumColor;
+}
+.demo-flex-display .oj-flex-item[class*="order"]:nth-child(3)
+{
+  background-color: $demoGridLargeColor;
+}
+.demo-flex-display .oj-flex-item[class*="order"]:nth-child(4)
+{
+  background-color: $demoGridXlargeColor;
+}
+
+@mixin demo-grid-chunk($selectorKeyword, $abbrevKeyword, $color, $iterate: $gridTotalColumns)
+{
+    @for $i from 1 through $iterate {
+
+
+      .demo-grid-sizes [class~="#{$selectorKeyword}-#{$i}"]:before { 
+           content: "#{$abbrevKeyword}-#{$i} "; }
+
+      .demo-flex-display [class~="#{$selectorKeyword}-#{$i}"],
+      .demo-flex-display [class~="#{$selectorKeyword}-odd-cols-#{$i}"] > .oj-flex > *,
+      .demo-flex-display [class~="#{$selectorKeyword}-even-cols-#{$i}"] > .oj-flex > *,
+      .demo-flex-display [class~="#{$selectorKeyword}-odd-cols-#{$i}"] > .oj-row > .oj-col,
+      .demo-flex-display [class~="#{$selectorKeyword}-even-cols-#{$i}"] > .oj-row > .oj-col { 
+           background-color: $color; }
+
+      .demo-flex-display [class~="#{$selectorKeyword}-odd-cols-#{$i}"] > .oj-flex,
+      .demo-flex-display [class~="#{$selectorKeyword}-even-cols-#{$i}"] > .oj-flex, 
+      .demo-flex-display [class~="#{$selectorKeyword}-odd-cols-#{$i}"] > .oj-row,
+      .demo-flex-display [class~="#{$selectorKeyword}-even-cols-#{$i}"] > .oj-row { 
+        margin-bottom: 5px;
+      }
+    }
+
+
+  .demo-responsive-display {
+    background-color: $color;
+  }
+}
+
+
+@media #{$responsiveQuerySmallUp} {
+  @include demo-grid-chunk("oj-sm", "S", $demoGridSmallColor);
+
+  .demo-grid-range:before { 
+           content: "sm"; }
+}
+
+@media #{$responsiveQueryMediumUp} {
+  @include demo-grid-chunk("oj-md", "M", $demoGridMediumColor);
+  .demo-grid-range:before { 
+           content: "md"; }
+}
+
+@media #{$responsiveQueryLargeUp} {
+  @include demo-grid-chunk("oj-lg", 'L', $demoGridLargeColor);
+  .demo-grid-range:before { 
+           content: "lg"; }
+}
+
+@media #{$responsiveQueryXlargeUp} {
+  @include demo-grid-chunk("oj-xl", 'XL', $demoGridXlargeColor);
+  .demo-grid-range:before { 
+           content: "xl"; }
+}
+
+
+
+//@media #{$responsiveQueryPrint} {
+//  @include demo-grid-chunk("oj-print", 'p',  null);
+//  .demo-grid-range:before { 
+//           content: "print"; }
+//}
+
+@media #{$responsiveQuerySmallOnly} {
+  .demo-responsive-vis .oj-flex > * > div.demo-responsive-on,
+  .demo-responsive-vis .oj-col > div.demo-responsive-on {
+    background-color: $demoGridSmallColor;
+  }
+}
+
+@media #{$responsiveQueryMediumOnly} {
+  .demo-responsive-vis .oj-flex > * > div.demo-responsive-on,
+  .demo-responsive-vis .oj-col > div.demo-responsive-on {
+    background-color: $demoGridMediumColor;
+  }
+}
+
+@media #{$responsiveQueryLargeOnly} {
+  .demo-responsive-vis .oj-flex > * > div.demo-responsive-on,
+  .demo-responsive-vis .oj-col > div.demo-responsive-on {
+    background-color: $demoGridLargeColor;
+  }
+}
+
+@media #{$responsiveQueryXlargeUp} {
+  .demo-responsive-vis .oj-flex > * > div.demo-responsive-on,
+  .demo-responsive-vis .oj-col > div.demo-responsive-on {
+    background-color: $demoGridXlargeColor;
+  }
+}
+
+
+
+.demo-responsive-vis .oj-flex > * > div,
+.demo-responsive-vis .oj-col > div {
+  padding: .7em 0;
+  font-size: 1.2em;
+  font-weight: bold;
+  text-align: center;
+  border-radius: 3px;
+  background-color:lightgray;
+  border: 1px solid darkgray;
+  color: gray;
+  white-space:nowrap;
+  box-sizing: border-box;
+  width: 7em;
+  margin-bottom: .3em;
+}
+
+
+.demo-responsive-vis .oj-flex > * > div.demo-responsive-on,
+.demo-responsive-vis .oj-col > div.demo-responsive-on {
+  color: black;
+}

@@ -1,0 +1,65 @@
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!--<h3 style="text-align: center;padding-top: 22px;border-bottom: 1px solid gray;">Beacon </h3>
+<div style="position: absolute;z-index: 300;width: 100%;">
+    <div style="margin: 0 auto;width: 140px;">
+        <p id="warningS" class="title" data-bind="text: warningText"></p>
+    </div>
+</div>
+<div id="map2" style="height:85vh"></div>-->
+<div class="oj-hybrid-padding" data-bind="visible: loadReady" >
+        <span style="text-align: center;padding-top: 22px;color: black;    display: block;">Beacon enable： <input id="switch" data-bind="ojComponent: {component: 'ojSwitch', 
+				value: isChecked}"/>
+            &nbsp;&nbsp;<strong data-bind="text: (isChecked()) ? 'yes' : 'no'"></strong></span>
+    <br/>
+    <div>
+        <span data-bind="text: message"></span>
+    </div>
+</div>
+
+<div  data-bind="visible: manualYN" class="oj-hybrid-padding">
+    <div>
+        <label for="senderId">UUID: </label>
+        <input id="uuid" 
+               type="text"
+               data-bind="ojComponent: {component: 'ojInputText', 
+                                  value: uuid}"/>
+        <hr/>
+        <label for="senderId">Major: </label>
+        <input id="major" 
+               type="text"
+               data-bind="ojComponent: {component: 'ojInputText', 
+                                  value: major}"/>
+
+        <label for="senderId">Minor: </label>
+        <input id="minor" 
+               type="text"
+               data-bind="ojComponent: {component: 'ojInputText', 
+                                  value: minor}"/>
+    </div>
+    <div>
+        <input id="submit" type="submit" 
+               data-bind="click: save, 
+                    ojComponent: {component: 'ojButton', label: 'Save setting', chroming: 'full'}
+               "/>
+    </div>
+</div>
+<hr/>
+<div id="map3" style="height:85vh"></div>
+<!--
+<div data-bind="visible: loadReady" class="oj-hybrid-padding">
+    <input id="submit" type="submit" 
+           data-bind="click: startMonitoring, 
+                    ojComponent: {component: 'ojButton', label: '啟用', chroming: 'full'}
+           "/>
+
+    <input id="submit" type="submit" 
+           data-bind="click: stopMonitoring, 
+                    ojComponent: {component: 'ojButton', label: '停用', chroming: 'full'}
+           "/>
+</div>
+-->
+

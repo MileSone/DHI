@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Oracle Mobile Cloud Service JavaScript SDK for Browsers Reference, Release: 16.2.3.0, E76062-01 Source: Analytics/Analytics.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.paper.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">Oracle Mobile Cloud Service JavaScript SDK for Browsers Reference, Release: 16.2.3.0, E76062-01</a>
+	</div>
+	<div class="navbar-collapse">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="mcs.html">mcs</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="Analytics.html">Analytics</a></li><li><a href="AnalyticsEvent.html">AnalyticsEvent</a></li><li><a href="Authorization.html">Authorization</a></li><li><a href="BasicAuthorization.html">BasicAuthorization</a></li><li><a href="BrowserPlatform.html">BrowserPlatform</a></li><li><a href="CustomCode.html">CustomCode</a></li><li><a href="Diagnostics.html">Diagnostics</a></li><li><a href="mcs.MobileBackendManager.html">mcs.MobileBackendManager</a></li><li><a href="MobileBackend.html">MobileBackend</a></li><li><a href="OAuthAuthorization.html">OAuthAuthorization</a></li><li><a href="Platform.html">Platform</a></li><li><a href="Storage.html">Storage</a></li><li><a href="StorageCollection.html">StorageCollection</a></li><li><a href="StorageObject.html">StorageObject</a></li><li><a href="User.html">User</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+	</div>
+</div>
+</div>
+
+
+<div class="container">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+			
+
+		<h1 class="page-title">Source: Analytics/Analytics.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">"use strict";
+
+/**
+ * Class that provides analytics capabilities. Callers should use
+ * MobileBackend's [Analytics()]{@link MobileBackend#Analytics} property.
+ * @constructor
+ */
+function Analytics(backend) {
+
+  /**
+   * The [MobileBackend]{@link MobileBackend} object that this Analytics instance belongs to.
+   * @type {MobileBackend}
+   * @readonly
+   */
+  this.backend = backend;
+
+  /**
+   * The current session's ID if a session exists.
+   * @type {String}
+   */
+  this.sessionID = null;
+
+  this._events = [];
+
+  /**
+   * Returns session Id for current session.
+   */
+  this.getSessionId = function(){
+    return this.sessionID;
+  };
+
+  /**
+   * Starts a new session. If one is in progress, then a new session will not be created.
+   */
+  this.startSession = function () {
+    if (this.sessionID == null) {
+      this.sessionID = mcs._Utils.uuid();
+      this.logNamedEvent("sessionStart").type = "system";
+    }
+  };
+
+  /**
+   * Ends a session if one exists.
+   */
+  this.endSession = function (successCallback, errorCallback) {
+    if (this.sessionID != null) {
+      this.logNamedEvent("sessionEnd").type = "system";
+      mcs._Logger.log("Deactivate a default session");
+      this.flush(successCallback,errorCallback);
+      this.sessionID = null;
+    }
+  };
+
+  /**
+   * Creates a new analytics event with the given name.
+   * @param name {String} The name of the event.
+   * @returns {AnalyticsEvent} The [AnalyticsEvent]{@link AnalyticsEvent} instance that was logged.
+   */
+  this.logNamedEvent = function (name) {
+    var event = new mcs.AnalyticsEvent(name);
+    this.logEvent(event);
+    return event;
+  };
+
+  /**
+   * Writes out an analytics event. It will implicitly call startSession(),
+   * which will adds a new event to the list of events for the Mobile Cloud Service to consume
+   * @param event {AnalyticsEvent} The event to log.
+   * @example event: "GettingStartedJSEvent"
+   * @returns {AnalyticsEvent} The [AnalyticsEvent]{@link AnalyticsEvent} instance that was logged.
+   */
+  this.logEvent = function (event) {
+    if (this._events.length == 0) {
+      this._events[0] = this._createContextEvent();
+    }
+
+    this.startSession();
+    this._events[this._events.length] = event;
+    event.sessionID = this.sessionID;
+
+    return event;
+  };
+
+  /**
+   * Callback invoked after successfully flushing analytics events.
+   * @callback Analytics~flushSuccessCallback
+   */
+
+  /**
+   * Callback invoked on error.
+   * @callback Analytics~errorCallback
+   * @param statusCode {Number} Any HTTP status code returned from the server, if available.
+   * @param message {String} The HTTP payload from the server, if available, or an error message.
+   */
+
+  /**
+   * Uploads all events to the service if the device is online or caches them locally until the device goes online at
+   * which point they will be uploaded. If a session is in progress it will end.
+   * @param successCallback {Analytics~flushSuccessCallback} Callback invoked on success.
+   * @param errorCallback {Analytics~errorCallback} Callback invoked on error.
+   */
+  this.flush = function (successCallback, errorCallback) {
+    for (var i = 0; i &lt; this._events.length; i++) {
+      if (this._events[i].name == "context") {
+
+        var gpsLocation = mcs.MobileBackendManager.platform.getGPSLocation();
+        if (gpsLocation != null &amp;&amp; gpsLocation.latitude != null) {
+          this._events[i].properties.latitude = gpsLocation.latitude;
+        }
+
+        if (gpsLocation != null &amp;&amp; gpsLocation.longitude != null) {
+          this._events[i].properties.longitude = gpsLocation.longitude;
+        }
+      }
+    }
+
+    var eventsString = JSON.stringify(this._events);
+
+    var analytics = this;
+    var headers = analytics.backend.getHttpHeaders();
+    headers["Content-Type"] = "application/json";
+    headers["Content-Length"] = eventsString.length;
+
+    mcs.MobileBackendManager.platform.invokeService({
+      method: 'POST',
+      url: analytics.backend.getPlatformUrl("analytics/events"),
+      headers: headers,
+      body: eventsString,
+      success: function () {
+        mcs._Logger.log("Analytics events flushed.");
+        analytics._events = [];
+        if (successCallback != null) {
+          successCallback();
+        }
+      },
+      error: function (statusCode, data) {
+        mcs._Logger.log("Failed to flush analytics events.");
+        if (errorCallback != null) {
+          errorCallback(statusCode, data);
+        }
+      }
+    });
+  };
+
+  this._createContextEvent = function () {
+    var contextEvent = new mcs.AnalyticsEvent("context");
+    contextEvent.type = "system";
+    contextEvent.properties.timezone = "" + new Date().getTimezoneOffset() * 60;
+
+    var deviceInformation = mcs.MobileBackendManager.platform.getDeviceInformation();
+    contextEvent.properties.model = deviceInformation.model;
+    contextEvent.properties.manufacturer = deviceInformation.manufacturer;
+    contextEvent.properties.osName = deviceInformation.osName;
+    contextEvent.properties.osVersion = deviceInformation.osVersion;
+    contextEvent.properties.osBuild = deviceInformation.osBuild;
+    contextEvent.properties.carrier = deviceInformation.carrier;
+
+    return contextEvent;
+  };
+}
+
+(function() {
+  var g = typeof window != 'undefined' ? window : global;
+
+  g.mcs= g.mcs || {};
+  g.mcs._Analytics = Analytics;
+}());
+</pre>
+    </article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+
+<footer>
+
+
+	<span class="copyright">
+	<center>Copyright &copy 2016, Oracle and/or its affiliates. All rights reserved.<center>
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+	on Thu Jun 23rd 2016 using the <a
+	href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<!--<script src="scripts/sunlight.js"></script>-->
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/bootstrap-dropdown.js"></script>
+<script src="scripts/toc.js"></script>
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
+		},
+		selectors   : "h1,h2,h3,h4",
+		showAndHide : false,
+                navbarOffset: 10,
+		smoothScrolling: true
+	} );
+
+	$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+	//			$( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
+
+  $( "table" ).each( function () {
+    var $this = $( this );
+    $this.addClass('table');
+  } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+</body>
+</html>

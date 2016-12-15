@@ -1,0 +1,37 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Aug 5, 2016, 4:43:15 PM
+    Author     : SCC
+*/
+
+//these are some of the settings from the "sanfrancisco" theme on the style lab
+/* for responsive screen rage settigns */
+$screenSmallRange:  0, 600px;
+$screenMediumRange: 600px, 1023px;
+
+$rootFontSize: 14px;
+$fontSize: $rootFontSize;
+$smallFontSize: $rootFontSize - 1px;
+$mediumFontSize: $rootFontSize + 2px;
+$largeFontSize: $rootFontSize + 4px;
+$largestFontSize: $rootFontSize + 6px;
+$fontFamily: 'Segoe UI', Segoe, Tahoma, Geneva, sans-serif !default;
+// color palette
+//black: #000000;
+//orange: #F2552C;
+//cream: #EDE6DB;
+//grey: #B5BAB6;
+//tan: #E7D1A1;
+//brown: #976F4C;
+$contrastBackground1Color: #000000;
+$interaction1Color: #F2552C;
+$interaction3Color: #ffefeb; // lightest orange
+$interaction4Color: #ffcabd; // light orange
+$iconColorHover: #f69279; // medium orange
+$linkTextColor: #8b2309; // darkest orange
+// white
+$contrastTextColor: #ffffff;

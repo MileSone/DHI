@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Oracle Mobile Cloud Service JavaScript SDK for Cordova Reference, Release: 16.2.3.0, E76063-01 Source: Authorization/Authorization.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.paper.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">Oracle Mobile Cloud Service JavaScript SDK for Cordova Reference, Release: 16.2.3.0, E76063-01</a>
+	</div>
+	<div class="navbar-collapse">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="mcs.html">mcs</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="Analytics.html">Analytics</a></li><li><a href="AnalyticsEvent.html">AnalyticsEvent</a></li><li><a href="Authorization.html">Authorization</a></li><li><a href="BasicAuthorization.html">BasicAuthorization</a></li><li><a href="BrowserPlatform.html">BrowserPlatform</a></li><li><a href="CordovaPlatform.html">CordovaPlatform</a></li><li><a href="CustomCode.html">CustomCode</a></li><li><a href="Diagnostics.html">Diagnostics</a></li><li><a href="FacebookAuthorization.html">FacebookAuthorization</a></li><li><a href="mcs.MobileBackendManager.html">mcs.MobileBackendManager</a></li><li><a href="MobileBackend.html">MobileBackend</a></li><li><a href="Notifications.html">Notifications</a></li><li><a href="OAuthAuthorization.html">OAuthAuthorization</a></li><li><a href="Platform.html">Platform</a></li><li><a href="SSOAuthorization.html">SSOAuthorization</a></li><li><a href="Storage.html">Storage</a></li><li><a href="StorageCollection.html">StorageCollection</a></li><li><a href="StorageObject.html">StorageObject</a></li><li><a href="User.html">User</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="global.html#IsInAppBrowserInstalled">IsInAppBrowserInstalled</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+	</div>
+</div>
+</div>
+
+
+<div class="container">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+			
+
+		<h1 class="page-title">Source: Authorization/Authorization.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">"use strict";
+
+/**
+ * Class used to authorize a mobile user against the Mobile Cloud Service. Callers should use
+ * MobileBackend's [Authorization()]{@link MobileBackend#Authorization} property.
+ * @constructor
+ */
+function Authorization(config, backend, type) {
+
+  /**
+   * The Authentication Type when we begin to add different types of login schemas like Facebook, Google, etc..
+   * @type {String}
+   */
+  this.AuthenticationType = type;
+
+  /**
+   * The [MobileBackend]{@link MobileBackend} object that this Synchronization instance belongs to.
+   * @type {MobileBackend}
+   * @readonly
+   */
+  this.backend = backend;
+
+  /**
+   * The config object gathered from the configuration file.
+   * @type {Object}
+   */
+  this.config = config;
+
+  /**
+   * The access token returned by the service after a successful call to authenticate() or authenticateAnonymous().
+   * @type {String}
+   */
+  this.token = null;
+
+  /**
+   * Returns the username of the current authorized user if any, null otherwise.
+   * @type {String}
+   */
+  this.authorizedUserName = null;
+
+
+  var auth = this;
+
+  /**
+   * Callback invoked after successfully authenticating.
+   * @callback Authorization~authenticateSuccessCallback
+   * @param statusCode {Number} Any HTTP status code returned from the server, if available.
+   * @param message {String} The HTTP payload from the server, if available, or an error message.
+   */
+
+  /**
+   * Callback invoked on error while authenticating.
+   * @callback Authorization~authenticateErrorCallback
+   * @param statusCode {Number} Any HTTP status code returned from the server, if available.
+   * @param message {String} The HTTP payload from the server, if available, or an error message.
+   */
+
+  /**
+   * Authenticates an anonymous user against the service. The user remains logged in until logout() is called.
+   * @param successCallback {Authorization~authenticateSuccessCallback} Optional callback invoked on success.
+   * @param errorCallback {Authorization~authenticateErrorCallback} Optional callback invoked on failure.
+   */
+  this.authenticateAnonymous = function(successCallback, errorCallback) {
+  };
+
+  /**
+   * Authenticates a user with the given credentials against the service. The user remains logged in until logout() is called.
+   * @param username {String} The username of the credentials.
+   * @param password {String} The password of the credentials.
+   * @param successCallback {Authorization~authenticateSuccessCallback} Optional callback invoked on success.
+   * @param errorCallback {Authorization~errorCallback} Optional callback invoked on failure.
+   */
+  this.authenticate = function(username, password, successCallback, errorCallback) {
+  };
+
+  /**
+   * Returns true if a user has been authorized, false otherwise. A user can be authorized by calling authenticate() or authenticateAnonymous().
+   * @returns {Boolean}
+   */
+  this.isAuthorized = function() {
+    return this.token != null;
+  };
+
+  /**
+   * Returns true if the access token returned by the service is still valid.
+   * @returns {Boolean}
+   */
+  this.isTokenValid = function() {
+    return this.token != null;
+  };
+
+  /**
+   * Refreshes the authentication token if it has expired. The authentication scheme should support refresh.
+   * @param successCallback {Authorization~authenticateSuccessCallback} Optional callback invoked on success.
+   * @param errorCallback {Authorization~errorCallback} Optional callback invoked on failure.
+   */
+  this.refreshToken = function(successCallback, errorCallback) {
+  };
+
+  /**
+   * Logs out the current user and clears credentials and tokens.
+   */
+  this.logout = function() {
+    this.token = null;
+    this.authorizedUserName = null;
+  };
+
+  /**
+   * Callback invoked after downloading or updating a user resource.
+   * @callback Authorization~userSuccessCallback
+   * @param statusCode {Number} Any HTTP status code returned from the server, if available.
+   * @param user {User} The user resource returned by the service.
+   */
+
+  /**
+   * Returns the user resource associated with the logged in user.
+   * @param successCallback {Authorization~userSuccessCallback} Optional callback invoked on success.
+   * @param errorCallback {Authorization~errorCallback} Optional callback invoked on failure.
+   * @returns {Object} returns the user with all the properties associated with that user.
+   * @example &lt;caption>Example usage of mcs.MobileBackend.Authorization.getCurrentUser()&lt;/caption>
+   * mcs.MobileBackend.Authorization.getCurrentUser(
+   * function(statusCode, data){
+   * },
+   * function(statusCode, data){
+   * });
+   * // returns statusCode, and the user object on successCallback function from the data parameter.
+   {
+     "id": "c9a5fdc5-737d-4e93-b292-d258ba334149",
+     "username": "DwainDRob",
+     "email": "js_sdk@mcs.com",
+     "firstName": "Mobile",
+     "lastName": "User",
+     "properties": {}
+   }
+   */
+  this.getCurrentUser = function(successCallback, errorCallback) {
+
+    mcs.MobileBackendManager.platform.invokeService({
+      method: 'GET',
+      url: auth.backend.getPlatformUrl("users/~"),
+      headers: auth.backend.getHttpHeaders(),
+
+      success: function(response, data) {
+        if(successCallback != null) {
+          var user = new mcs.User(data);
+          if(user.links != null) {
+            delete user.links;
+          }
+          successCallback(response.status,user);
+        }
+      },
+      error: function(statusCode, data) {
+        if(errorCallback != null) {
+          errorCallback(statusCode, data);
+        }
+      }
+    });
+  };
+
+  ///**
+  // * Updates the user resource for the currently logged in user.
+  // * @param user {Authorization~User} The user resource to update
+  // * @param successCallback {Authorization~userSuccessCallback} Optional callback invoked on success.
+  // * @param errorCallback {Authorization~errorCallback} Optional callback invoked on failure.
+  // */
+  //this.updateCurrentUser = function(user, successCallback, errorCallback) {
+  //  if(!this.token) {
+  //    if(failureCallback != null) {
+  //      failureCallback("No logged in user!");
+  //      return;
+  //    }
+  //  }
+  //
+  //  var auth = this;
+  //  var userString = JSON.stringify(user);
+  //  var headers = auth.backend.getHttpHeaders();
+  //  headers["Accept"] = "application/json";
+  //  headers["Accept-Encoding"] = "gzip";
+  //  headers["Content-Type"] = "application/json";
+  //  headers["Content-Length"] = userString.length;
+  //
+  //  mcs.MobileBackendManager.platform.invokeService({
+  //    method: 'PUT',
+  //    url: auth.backend.getPlatformUrl("users/~"),
+  //    headers: headers,
+  //    body: userString,
+  //    success: function(response, data) {
+  //      if(successCallback != null) {
+  //        successCallback(response.status, data);
+  //      }
+  //    },
+  //    error: function(statusCode, data) {
+  //      if(errorCallback != null) {
+  //        errorCallback(statusCode, data);
+  //      }
+  //    }
+  //  });
+  //};
+
+  this._getHttpHeaders = function(headers) {
+  };
+}
+
+(function() {
+
+  var g = typeof window != 'undefined' ? window : global;
+
+  g.mcs = g.mcs || {};
+  g.mcs.Authorization = Authorization;
+
+  /**
+   * Basic Auth Authentication Type
+   * @type {string}
+   */
+  g.mcs.AuthenticationTypeBasic = "basicAuth";
+
+  /**
+   * OAuth Authentication Type
+   * @type {string}
+   */
+  g.mcs.AuthenticationTypeOAuth = "oAuth";
+
+  /**
+   * Single Sign On Authentication Type
+   * @type {string}
+   */
+  g.mcs.AuthenticationTypeSSO = "ssoAuth";
+
+  /**
+   * Facebook OAuth Authentication Type
+   * @type {string}
+   */
+  g.mcs.AuthenticationTypeFacebook = "facebookAuth";
+}());
+</pre>
+    </article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+
+<footer>
+
+
+	<span class="copyright">
+	<center>Copyright &copy 2016, Oracle and/or its affiliates. All rights reserved.<center>
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+	on Thu Jun 23rd 2016 using the <a
+	href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<!--<script src="scripts/sunlight.js"></script>-->
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/bootstrap-dropdown.js"></script>
+<script src="scripts/toc.js"></script>
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
+		},
+		selectors   : "h1,h2,h3,h4",
+		showAndHide : false,
+                navbarOffset: 10,
+		smoothScrolling: true
+	} );
+
+	$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+	//			$( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
+
+  $( "table" ).each( function () {
+    var $this = $( this );
+    $this.addClass('table');
+  } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+</body>
+</html>

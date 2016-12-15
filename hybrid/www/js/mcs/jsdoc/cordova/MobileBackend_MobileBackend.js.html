@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Oracle Mobile Cloud Service JavaScript SDK for Cordova Reference, Release: 16.2.3.0, E76063-01 Source: MobileBackend/MobileBackend.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.paper.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">Oracle Mobile Cloud Service JavaScript SDK for Cordova Reference, Release: 16.2.3.0, E76063-01</a>
+	</div>
+	<div class="navbar-collapse">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="mcs.html">mcs</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="Analytics.html">Analytics</a></li><li><a href="AnalyticsEvent.html">AnalyticsEvent</a></li><li><a href="Authorization.html">Authorization</a></li><li><a href="BasicAuthorization.html">BasicAuthorization</a></li><li><a href="BrowserPlatform.html">BrowserPlatform</a></li><li><a href="CordovaPlatform.html">CordovaPlatform</a></li><li><a href="CustomCode.html">CustomCode</a></li><li><a href="Diagnostics.html">Diagnostics</a></li><li><a href="FacebookAuthorization.html">FacebookAuthorization</a></li><li><a href="mcs.MobileBackendManager.html">mcs.MobileBackendManager</a></li><li><a href="MobileBackend.html">MobileBackend</a></li><li><a href="Notifications.html">Notifications</a></li><li><a href="OAuthAuthorization.html">OAuthAuthorization</a></li><li><a href="Platform.html">Platform</a></li><li><a href="SSOAuthorization.html">SSOAuthorization</a></li><li><a href="Storage.html">Storage</a></li><li><a href="StorageCollection.html">StorageCollection</a></li><li><a href="StorageObject.html">StorageObject</a></li><li><a href="User.html">User</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="global.html#IsInAppBrowserInstalled">IsInAppBrowserInstalled</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+	</div>
+</div>
+</div>
+
+
+<div class="container">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+			
+
+		<h1 class="page-title">Source: MobileBackend/MobileBackend.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">"use strict";
+
+/**
+ * Represents a Mobile Backend in the Mobile Cloud Service and provides access to all capabilities of the backend.
+ * Callers should use MobileBackendManager's [getMobileBackend()]{@link MobileBackendManager#getMobileBackend} method.
+ * @constructor
+ */
+function MobileBackend(name, config) {
+
+
+  var platformPath = 'mobile/platform';
+  var customCodePath = 'mobile/custom';
+
+  var AuthenticationType = null;
+
+  var backend = this;
+
+
+  /**
+   * The name of the MobileBackend as read from the configuration.
+   * @type {String}
+   */
+  this.name = name;
+
+  this._config = config;
+
+
+
+  /**
+   * Returns anonymous token for the current backend.
+   */
+  this.getAuthenticationTypeVariable = function(){
+    return AuthenticationType;
+  };
+
+  /**
+   * Sets Authentication variable for MobileBackend.
+   * @param type
+   */
+  this.setAuthenticationTypeVariable = function(type){
+    AuthenticationType = type;
+  };
+
+
+  /**
+   * Constructs a full url including the prefix for platform API REST endpoints given a path.
+   * @param path {String} The path of the endpoint following the platform prefix ie {BaseUrl}/mobile/platform.
+   * @returns {String} The full url.
+   */
+  this.getPlatformUrl = function (path) {
+
+    var url = this._config.baseUrl;
+
+    // dev instance hack, replace port ends with 1 with 7777
+    if(backend.getAuthenticationTypeVariable() == "ssoAuth" &amp;&amp; strEndsWith(this._config.baseUrl,"1")){
+      url = url.substring(0, url.length - 4) + "7777";
+    }
+
+    url = mcs._Utils.validateConfiguration(url) + "/" + platformPath;
+    if (!strEndsWith(url, "/")) {
+      url += "/";
+    }
+    return url + path;
+  };
+
+  /**
+   * Constructs a full url including the prefix for custom code API REST endpoints given a path.
+   * @param path {String} The path of the endpoint following the custom code prefix ie {BaseUrl}/mobile/custom.
+   * @returns {String} The full url.
+   */
+  this.getCustomCodeUrl = function (path) {
+    var url = mcs._Utils.validateConfiguration(this._config.baseUrl) + "/" + customCodePath;
+    if (!strEndsWith(path,"/")) {
+      url += "/";
+    }
+
+    return url + path;
+  };
+
+  /**
+   * Constructs a full url including the prefix for oAuth token API REST endpoints given a path.
+   * @returns {String} The full url for oAuth token endpoint.
+   */
+  this.getOAuthTokenUrl = function () {
+    var tokenUri = mcs._Utils.validateConfiguration(this._config.authorization.oAuth.tokenEndpoint);
+    if(!strEndsWith(tokenUri,"/")) {
+      tokenUri += "/"
+    }
+    return tokenUri;
+  };
+
+
+  /**
+   * Constructs a full url including the prefix for ssoAuth token API REST endpoints given a path.
+   * @returns {String} The full url for oAuth token endpoint.
+   */
+  this.getSSOAuthTokenUrl = function () {
+    var tokenUri = mcs._Utils.validateConfiguration(this._config.authorization.ssoAuth.tokenEndpoint);
+    if(!strEndsWith(tokenUri,"/")) {
+      tokenUri += "/"
+    }
+    return tokenUri;
+  };
+
+  /**
+   * Populates auth and diagnostics HTTP headers for making REST calls to a mobile backend.
+   * @param headers {Object} An optional object which to populate with the headers.
+   * @returns {Object} The headers parameter that is passed in and if not provided, a new object with the populated
+   * headers as properties of that object.
+   */
+  this.getHttpHeaders = function (headers) {
+    if (headers == null) {
+      headers = {};
+    }
+
+    this.Diagnostics._getHttpHeaders(headers);
+
+    if (this.Authorization.getIsAuthorized() !== false &amp;&amp; this.Authorization.getIsAnonymous() !== false) {
+      this.Authorization._getAnonymousHttpHeaders(headers);
+    }
+    else {
+      this.Authorization._getHttpHeaders(headers);
+    }
+
+    return headers;
+  };
+
+  /**
+   * Returns the Authorization object that provides authorization capabilities and access to user properties.
+   * @param {string} type.
+   * For using Basic Authentication you would use "basicAuth" to use Basic Authentication security schema.
+   * For using OAuth Authentication you would use "oAuth" to use OAuth Authentication security schema.
+   * If you put any other type other than those two it will throw an Exception stating that the type of Authentication that you provided
+   * we do not support at this time.
+   * @type {Authorization}
+   * @example &lt;caption>Example usage of mcs.MobileBackend.setAuthenticationType()&lt;/caption>
+   * @example mcs.MobileBackend.setAuthenicationType("basicAuth");
+   * //Basic Authorization schema
+   * @example mcs.MobileBackend.setAuthenicationType("oAuth");
+   * //OAuth Authorization schema
+   * @example mcs.MobileBackend.setAuthenicationType("facebookAuth");
+   * //Facebook Authorization schema
+   * @example mcs.MobileBackend.setAuthenicationType("ssoAuth");
+   * //Single Sign On Authorization schema
+   */
+  this.setAuthenticationType = function(type) {
+
+    var authType = mcs._Utils.validateConfiguration(type);
+
+    this.Authorization = null;
+
+    if (!this._config.authorization.hasOwnProperty(authType)) {
+      throw mcs._Logger.Exception("No Authentication Type called " + type +
+        " is defined in MobileBackendManager.config " + "\n" +
+        "check MobileBackendManager.config in authorization object for the following objects:" + "\n" +
+        mcs.AuthenticationTypeBasic + "\n" +
+        mcs.AuthenticationTypeOAuth + "\n"+
+        mcs.AuthenticationTypeFacebook + "\n"+
+        mcs.AuthenticationTypeSSO);
+    }
+
+    if (this.Authorization !== null &amp;&amp; this.Authorization.getIsAuthorized() !== false) {
+      this.Authorization.logout();
+    }
+
+    if (authType == mcs.AuthenticationTypeBasic) {
+      this.Authorization = new mcs._BasicAuthorization(this._config.authorization.basicAuth, this, this._config.applicationKey);
+      mcs._Logger.log(mcs.logLevelInfo,  "Your Authentication type: " + authType);
+      backend.setAuthenticationTypeVariable(authType);
+    }
+    else if (authType == mcs.AuthenticationTypeOAuth) {
+      this.Authorization = new mcs._OAuthAuthorization(this._config.authorization.oAuth, this,this._config.applicationKey);
+      mcs._Logger.log(mcs.logLevelInfo,  "Your Authentication type: " + authType);
+      backend.setAuthenticationTypeVariable(authType);
+    }
+    else if(authType == mcs.AuthenticationTypeFacebook){
+      this.Authorization = new mcs._FacebookAuthorization(this._config.authorization.facebookAuth,this,this._config.applicationKey);
+      mcs._Logger.log(mcs.logLevelInfo,  "Your Authentication type: " + authType);
+      backend.setAuthenticationTypeVariable(authType);
+    }
+    else if(authType == mcs.AuthenticationTypeSSO){
+      this.Authorization = new mcs._SSOAuthorization(this._config.authorization.ssoAuth,this,this._config.applicationKey);
+      mcs._Logger.log(mcs.logLevelInfo, "Your Authentication type: " + authType);
+      backend.setAuthenticationTypeVariable(authType);
+    }
+    return this.Authorization;
+  };
+
+
+  /**
+   * Returns the Authorization object that enables end-end authorization capabilities.
+   * @return {Authorization} Object
+   */
+  this.getAuthenticationType = function(){
+    return this.Authorization;
+  };
+
+  /**
+   * Checks to see if the string ends with a suffix.
+   * @return {boolean}
+   */
+  function strEndsWith(str, suffix) {
+    return str.match(suffix+"$")==suffix;
+  }
+
+  /**
+   * Returns the Diagnostics object that enables end-end debugging across application and cloud.
+   * @type {Diagnostics}
+   */
+  this.Diagnostics = new mcs._Diagnostics(this);
+
+  /**
+   * Returns the Custom Code object that enables called into Custom Code and performing operations
+   * on created APIs.
+   * @type {CustomCode}
+   */
+  this.CustomCode = new mcs.CustomCode(this);
+
+  /**
+   * Returns the Analytics object that enables capturing mobile analytics events.
+   * @type {Analytics}
+   */
+  this.Analytics = new mcs._Analytics(this);
+
+  /**
+   * Returns the Storage object that provides cloud based storage capabilities.
+   * @type {Storage}
+   */
+  this.Storage = new mcs._Storage(this);
+
+  ///**
+  // * Returns the Synchronization object that provides caching and synchronization capabilities.
+  // * @type {Synchronization}
+  // */
+  //this.Synchronization = new mcs._Synchronization(this);
+
+  /**
+   * Returns the Notifications object that provides notification capabilities.
+   * @type {Notifications}
+   */
+  if(mcs._Notifications){
+    this.Notifications = new mcs._Notifications(this);
+  }
+
+  /**
+   * Returns an instance of the application configuration object.
+   * Callers can download the configuration form the service by invoking loadAppConfig().
+   * @type {Object}
+   */
+  this.AppConfig = {};
+
+  /**
+   * Callback invoked after downloading application configuration.
+   * @callback MobileBackend~appConfigSuccessCallback
+   * @param statusCode {Number} Any HTTP status code returned from the server, if available.
+   * @param appConfig {Object} The downloaded application configuration object.
+   */
+
+  /**
+   * Callback invoked on error while downloading application configuration.
+   * @callback MobileBackend~errorCallback
+   * @param statusCode {Number} Any HTTP status code returned from the server, if available.
+   * @param message {String} The HTTP payload from the server, if available, or an error message.
+   */
+
+  /**
+   * Downloads the configuration from the service. The AppConfig property will contain the downloaded configuration.
+   * @param successCallback {MobileBackend~appConfigSuccessCallback} Optional callback invoked on success.
+   * @param errorCallback {MobileBackend~errorCallback} Optional callback invoked on failure.
+   */
+  this.loadAppConfig = function(successCallback, errorCallback) {
+
+    if (!backend.Authorization.isAuthorized) {
+      backend.Authorization.authenticateAnonymous(function () {
+          backend._loadAppConfig(successCallback, errorCallback);
+        },
+        errorCallback
+      );
+    } else {
+      backend._loadAppConfig(successCallback, errorCallback);
+    }
+  };
+
+  this._loadAppConfig = function(successCallback, errorCallback) {
+
+    var headers = backend.getHttpHeaders();
+    headers["Content-Type"] = "application/json";
+
+    mcs.MobileBackendManager.platform.invokeService({
+      method: 'GET',
+      url: backend.getPlatformUrl("appconfig/client"),
+      headers: headers,
+      success: function(response, data) {
+        mcs._Logger.log(mcs.logLevelInfo,  "New WebStarterApp config downloaded with status code: " + response.status);
+
+        backend.AppConfig = data;
+
+        if(successCallback != null) {
+          successCallback(response.status,backend.AppConfig);
+        }
+      },
+      error: function(statusCode, data) {
+        mcs._Logger.log(mcs.logLevelError,  "App config download failed! with status code: " + statusCode);
+
+        if(errorCallback != null) {
+          errorCallback(statusCode,data);
+        }
+      }
+    });
+
+  };
+}
+
+(function() {
+  var g = typeof window != 'undefined' ? window : global;
+
+  g.mcs = g.mcs || {};
+  g.mcs._MobileBackend = MobileBackend;
+}());
+</pre>
+    </article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+
+<footer>
+
+
+	<span class="copyright">
+	<center>Copyright &copy 2016, Oracle and/or its affiliates. All rights reserved.<center>
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+	on Thu Jun 23rd 2016 using the <a
+	href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<!--<script src="scripts/sunlight.js"></script>-->
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/bootstrap-dropdown.js"></script>
+<script src="scripts/toc.js"></script>
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
+		},
+		selectors   : "h1,h2,h3,h4",
+		showAndHide : false,
+                navbarOffset: 10,
+		smoothScrolling: true
+	} );
+
+	$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+	//			$( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
+
+  $( "table" ).each( function () {
+    var $this = $( this );
+    $this.addClass('table');
+  } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+</body>
+</html>

@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Oracle Mobile Cloud Service JavaScript SDK for Cordova Reference, Release: 16.2.3.0, E76063-01 Source: Authorization/SSOAuthorization.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.paper.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">Oracle Mobile Cloud Service JavaScript SDK for Cordova Reference, Release: 16.2.3.0, E76063-01</a>
+	</div>
+	<div class="navbar-collapse">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="mcs.html">mcs</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="Analytics.html">Analytics</a></li><li><a href="AnalyticsEvent.html">AnalyticsEvent</a></li><li><a href="Authorization.html">Authorization</a></li><li><a href="BasicAuthorization.html">BasicAuthorization</a></li><li><a href="BrowserPlatform.html">BrowserPlatform</a></li><li><a href="CordovaPlatform.html">CordovaPlatform</a></li><li><a href="CustomCode.html">CustomCode</a></li><li><a href="Diagnostics.html">Diagnostics</a></li><li><a href="FacebookAuthorization.html">FacebookAuthorization</a></li><li><a href="mcs.MobileBackendManager.html">mcs.MobileBackendManager</a></li><li><a href="MobileBackend.html">MobileBackend</a></li><li><a href="Notifications.html">Notifications</a></li><li><a href="OAuthAuthorization.html">OAuthAuthorization</a></li><li><a href="Platform.html">Platform</a></li><li><a href="SSOAuthorization.html">SSOAuthorization</a></li><li><a href="Storage.html">Storage</a></li><li><a href="StorageCollection.html">StorageCollection</a></li><li><a href="StorageObject.html">StorageObject</a></li><li><a href="User.html">User</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="global.html#IsInAppBrowserInstalled">IsInAppBrowserInstalled</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+	</div>
+</div>
+</div>
+
+
+<div class="container">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+			
+
+		<h1 class="page-title">Source: Authorization/SSOAuthorization.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">/**
+ * Created by ddrobins on 11/19/15.
+ */
+'use strict';
+
+/**
+ * Class used to authorize a mobile user against the Mobile Cloud Service. Callers should use
+ * MobileBackend's [SSOAuthAuthorization()]{@link MobileBackend#SSOAuthAuthorization} property.
+ * @constructor
+ */
+
+function SSOAuthorization(config, backend, appKey) {
+
+  Authorization.call(this, config, backend, mcs.AuthenticationTypeSSO);
+
+  var _clientId = mcs._Utils.validateConfiguration(config.clientId);
+  var _clientSecret = mcs._Utils.validateConfiguration(config.clientSecret);
+  var _appKey = mcs._Utils.validateConfiguration(appKey);
+
+  if(config.hasOwnProperty("userIdentityDomainName")){
+    var _tenantName = mcs._Utils.validateConfiguration(config.userIdentityDomainName);
+  }
+
+  var AuthorizationHeader = "Authorization";
+  var UserIdentityDomainNameHeader = "X-USER-IDENTITY-DOMAIN-NAME";
+  var ApplicationKeyHeader = "Oracle-Mobile-Application-Key";
+
+
+  var anonymousAccessToken = null;
+  var AccessToken = null;
+  var ExpiredTime = null;
+  var isAuthorized = false;
+  var isAnonymous = false;
+
+  var ssoAuth = this;
+
+  /**
+   * The [MobileBackend]{@link MobileBackend} object that this Authorization instance belongs to.
+   * @type {MobileBackend}
+   * @readonly
+   */
+  this.backend = backend;
+
+  /**
+   * Returns client Id for the current backend.
+   * @type {String}
+   */
+  this.getClientId = function(){
+    return _clientId;
+  };
+
+  /**
+   * Returns tenantName for the current backend.
+   * @type {String}
+   */
+  this.getTenantName = function(){
+    return _tenantName;
+  };
+
+  /**
+   * Returns the client Secret for the current backend.
+   * @type {String}
+   */
+  this.getClientSecret= function(){
+    return _clientSecret;
+  };
+
+  /**
+   * Returns application key for the current backend.
+   * @type {String}
+   */
+  this.getApplicationKey = function(){
+    return _appKey;
+  };
+
+  /**
+   * Returns the current access token from user credentials.
+   * @return current access token from user credentials.
+   */
+  this.getAccessToken = function () {
+    return AccessToken;
+  };
+
+  /**
+   * Sets the accessToken for using the current access token from user credentials.
+   * @param accesstoken
+   */
+  this.setAccessToken = function (accesstoken) {
+    AccessToken = accesstoken;
+  };
+
+  /**
+   * Returns the current anonymous access token.
+   * @return current anonymous access token.
+   */
+  this.getAnonymousAccessToken = function () {
+    return anonymousAccessToken;
+  };
+
+  /**
+   * Sets the current anonymous access token.
+   * @param accesstoken
+   */
+  this.setAnonymousAccessToken = function (accesstoken) {
+    anonymousAccessToken = accesstoken;
+  };
+
+  /**
+   * Returns the current isAuthorized variable value.
+   * @return current isAuthorized variable value.
+   */
+  this.getIsAuthorized = function () {
+    return isAuthorized;
+  };
+
+  /**
+   * Sets the current isAuthorized variable value.
+   * @param authorized
+   */
+  this.setIsAuthorized = function (authorized) {
+    isAuthorized = authorized;
+  };
+
+  /**
+   * Returns the current isAnonymous variable value.
+   * @return current isAnonymous variable value.
+   */
+  this.getIsAnonymous = function () {
+    return isAnonymous;
+  };
+
+  /**
+   * Sets the current isAnonymous variable value.
+   * @param anonymous
+   */
+  this.setIsAnonymous = function (anonymous) {
+    isAnonymous = anonymous;
+  };
+
+  /**
+   * Callback invoked after successfully authenticating.
+   * @callback Authorization~authenticateSuccessCallback
+   * @param statusCode {Number} Any HTTP status code returned from the server, if available.
+   * @param message {String} The HTTP payload from the server, if available, or an error message.
+   */
+
+  /**
+   * Callback invoked on error while authenticating.
+   * @callback Authorization~authenticateErrorCallback
+   * @param statusCode {Number} Any HTTP status code returned from the server, if available.
+   * @param message {String} The HTTP payload from the server, if available, or an error message.
+   */
+
+  /**
+   * Authenticates a user with the given credentials against OAM and Single Sign On. The user remains logged in until logout() is called.
+   * In the Single Sign On console the user must enable the Mobile Backend with SSO from OAM.
+   * @param successCallback {Authorization~authenticateSuccessCallback} Optional callback invoked on success.
+   * @param errorCallback {Authorization~authenticateErrorCallback} Optional callback invoked on failure.
+   */
+  this.authenticate = function(successCallback,errorCallback){
+
+    ssoAuth.logout();
+    var sso_token = {};
+    var clientId = ssoAuth.getClientId();
+
+    if(window.cordova) {
+      var metadata = cordova.require("cordova/plugin_list").metadata;
+
+      if (IsInAppBrowserInstalled(metadata) !== true) {
+        if (errorCallback != null) {
+          errorCallback(100, 'Could not find InAppBrowser plugin, use command cordova plugin add cordova-plugin-inappbrowser');
+        }
+      }
+
+      else {
+          var flowUrl = ssoAuth.backend.getPlatformUrl("sso/token") + "?clientID=" + clientId + "&amp;format=json";
+          var browserRef = window.open(flowUrl, '_blank', 'location=no,clearsessioncache=yes,clearcache=yes');
+          browserRef.show();
+
+          mcs._Logger.log(mcs.logLevelInfo, "Opening InAppBrowser to url: " + flowUrl);
+
+          browserRef.addEventListener('loadstop', function (event) {
+            if ((event.url).indexOf(flowUrl) === 0) {
+              browserRef.executeScript({code: "document.body.innerHTML"},
+                function (htmlarray) {
+                  var html = htmlarray[0];
+                  var start = html.indexOf("{");
+                  var end = html.lastIndexOf("}") + 1;
+                  var json = html.substring(start, end);
+                  sso_token = JSON.parse(json);
+                  browserRef.close();
+                  if (sso_token.access_token !== undefined &amp;&amp; sso_token.access_token !== null) {
+                    mcs._Logger.log(mcs.logLevelInfo, "Access Token and token expired time received");
+                    ssoAuth.setIsAuthorized(true);
+                    ssoAuth.setIsAnonymous(false);
+                    ssoAuth.setAccessToken(sso_token.access_token);
+                    ExpiredTime = Date.now() + sso_token.expires_in * 1000;
+
+                    if (successCallback !== null) {
+                      successCallback(200, sso_token);
+                    }
+                  } else {
+                      if (ssoAuth.isAuthorized !== true &amp;&amp; sso_token.status >= 401) {
+                        if (errorCallback !== null) {
+                          errorCallback(sso_token.status, sso_token.detail);
+                        }
+                      }
+                  }
+                });
+              }
+          });
+
+          browserRef.addEventListener('exit', function () {
+            if (ssoAuth.isAuthorized !== true || sso_token.status !== null) {
+              if (errorCallback !== null) {
+                errorCallback(100, 'Cannot authenticate via a web browser');
+              }
+            }
+          });
+        }
+      }
+    };
+
+
+  /**
+   * Authenticates an anonymous user against the service. The user remains logged in until logout() is called.
+   * @param successCallback {Authorization~authenticateSuccessCallback} Optional callback invoked on success.
+   * @param errorCallback {Authorization~authenticateErrorCallback} Optional callback invoked on failure.
+   */
+  this.authenticateAnonymous = function (successCallback, errorCallback) {
+
+    ssoAuth.logout();
+
+    var currentToken = "Basic " + mcs._Utils.encodeBase64(ssoAuth.getClientId() + ":" + ssoAuth.getClientSecret());
+
+    var headers = {};
+
+    headers['Content-type'] = 'application/x-www-form-urlencoded; charset=utf-8';
+    headers[AuthorizationHeader] = currentToken;
+    headers[ApplicationKeyHeader] = ssoAuth.getApplicationKey();
+
+    if (typeof ssoAuth.getTenantName() !== 'undefined') {
+      headers[UserIdentityDomainNameHeader] = ssoAuth.getTenantName();
+    }
+
+    mcs.MobileBackendManager.platform.invokeService({
+      url: ssoAuth.backend.getSSOAuthTokenUrl(),
+      method: 'POST',
+      headers: headers,
+      body: 'grant_type=client_credentials',
+
+      success: function (response, data) {
+        mcs._Logger.log(mcs.logLevelInfo, "OAuth Token received and time before it expires in seconds");
+        ssoAuth.setIsAnonymous(true);
+        ssoAuth.setIsAuthorized(true);
+        ssoAuth.setAnonymousAccessToken(data.access_token);
+        ExpiredTime = Date.now() + data.expires_in * 1000;
+
+        if (successCallback != null) {
+          successCallback(response.status, data);
+        }
+      },
+      error: function (statusCode, data) {
+        mcs._Logger.log(mcs.logLevelError, "Login failed with error: " + statusCode);
+
+        if (errorCallback != null) {
+          errorCallback(statusCode, data);
+        }
+      }
+    });
+  };
+
+
+
+  /**
+   * Checks to see if the correct plugin is installed into the application.
+   * @return {boolean}
+   */
+  var IsInAppBrowserInstalled = function(metadata){
+
+    var inAppBrowserNames = ["cordova-plugin-inappbrowser", "org.apache.cordova.inappbrowser"];
+    return inAppBrowserNames.some(function(name) {
+      return metadata.hasOwnProperty(name);
+    });
+  };
+
+  /**
+   * Clears out the current session cookies from OAM and logs out the user.
+   */
+  var clearCookies = function(){
+
+    mcs.MobileBackendManager.platform.invokeService({
+      url: "https://slc09kgw.us.oracle.com:4443/oam/server/logout",
+      method: 'GET',
+
+      success: function (response) {
+        mcs._Logger.log(mcs.logLevelInfo, "User logged out " + response.status);
+      },
+      error: function(statusCode) {
+        mcs._Logger.log(mcs.logLevelError, "Logout failed with error: " + statusCode);
+      }
+    });
+  };
+
+  /**
+   * Checks to see if the OAuth token is null,undefined,NaN,empty string (""),0,false and also checks the timestamp
+   * of when the token was first retrieved to see if it was still valid.
+   * @returns {Boolean}
+   */
+  this.isTokenValid = function () {
+
+    if (ssoAuth.getAccessToken() || ssoAuth.getAnonymousAccessToken()) {
+      mcs._Logger.log(mcs.logLevelVerbose, "OAuth Token is not null or empty");
+    }
+    var currentTime = Date.now();
+    if (currentTime >= ExpiredTime) {
+      mcs._Logger.log(mcs.logLevelInfo, "Token has expired or user has not been authenticate with the service");
+      return false;
+    }
+    else {
+      mcs._Logger.log(mcs.logLevelVerbose, "Token is still valid");
+      return true;
+    }
+  };
+
+  /**
+   * Logs out the current user and clears credentials and tokens and cookies.
+   */
+  this.logout = function() {
+    ssoAuth.setIsAnonymous(false);
+    ssoAuth.setIsAuthorized(false);
+    ssoAuth.setAccessToken(null);
+    ssoAuth.setAnonymousAccessToken(null);
+    ExpiredTime = Date.now() * 1000;
+    clearCookies();
+  };
+
+  /**
+   * Refreshes the authentication token if it has expired. The authentication scheme should support refresh.
+   * @param successCallback {Authorization~authenticateSuccessCallback} Optional callback invoked on success.
+   * @param errorCallback {Authorization~authenticateErrorCallback} Optional callback invoked on failure.
+   */
+  this.refreshToken = function(successCallback,errorCallback) {
+
+    var boolean = ssoAuth.isTokenValid();
+
+    if (boolean !== false) {
+      if (ssoAuth.getAccessToken() == null &amp;&amp; ssoAuth.getIsAnonymous() !== false) {
+        if (successCallback != null) {
+          mcs._Logger.log(mcs.logLevelError, "Anonymous token is valid, you do not need to refresh.");
+          successCallback(200, ssoAuth.getAnonymousAccessToken());
+        }
+      }
+      if (ssoAuth.getAnonymousAccessToken() == null &amp;&amp; ssoAuth.getIsAnonymous() !== true) {
+        if (successCallback != null) {
+          mcs._Logger.log(mcs.logLevelError, "Authenticated token is valid, you do not need to refresh.");
+          successCallback(200, ssoAuth.getAccessToken());
+        }
+      }
+    }
+    else{
+      mcs._Logger.log(mcs.logLevelError, "Token is not valid and has expired, refreshing token from service.");
+      ssoAuth.authenticate(successCallback, errorCallback);
+    }
+  };
+
+
+  this._getHttpHeaders = function (headers) {
+    if (ssoAuth.getAccessToken() !== null &amp;&amp; typeof ssoAuth.getAccessToken() == "string") {
+      headers[AuthorizationHeader] = "Bearer " + ssoAuth.getAccessToken();
+    }
+    headers[ApplicationKeyHeader] = ssoAuth.getApplicationKey();
+  };
+
+
+  this._getAnonymousHttpHeaders = function (headers) {
+    if (ssoAuth.getAnonymousAccessToken() !== null &amp;&amp; typeof ssoAuth.getAnonymousAccessToken() == "string") {
+      headers[AuthorizationHeader] = "Bearer " + ssoAuth.getAnonymousAccessToken();
+    }
+    headers[ApplicationKeyHeader] = ssoAuth.getApplicationKey();
+  };
+
+}
+
+
+(function() {
+
+  SSOAuthorization.prototype = new mcs.Authorization();
+
+  var g = typeof window != 'undefined' ? window : global;
+  g.mcs = g.mcs || {};
+  g.mcs._SSOAuthorization = SSOAuthorization;
+}());
+</pre>
+    </article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+
+<footer>
+
+
+	<span class="copyright">
+	<center>Copyright &copy 2016, Oracle and/or its affiliates. All rights reserved.<center>
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+	on Thu Jun 23rd 2016 using the <a
+	href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<!--<script src="scripts/sunlight.js"></script>-->
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/bootstrap-dropdown.js"></script>
+<script src="scripts/toc.js"></script>
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
+		},
+		selectors   : "h1,h2,h3,h4",
+		showAndHide : false,
+                navbarOffset: 10,
+		smoothScrolling: true
+	} );
+
+	$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+	//			$( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
+
+  $( "table" ).each( function () {
+    var $this = $( this );
+    $this.addClass('table');
+  } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+</body>
+</html>

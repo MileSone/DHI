@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Oracle Mobile Cloud Service JavaScript SDK for Cordova Reference, Release: 16.2.3.0, E76063-01 Source: Storage/StorageCollection.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.paper.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">Oracle Mobile Cloud Service JavaScript SDK for Cordova Reference, Release: 16.2.3.0, E76063-01</a>
+	</div>
+	<div class="navbar-collapse">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="mcs.html">mcs</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="Analytics.html">Analytics</a></li><li><a href="AnalyticsEvent.html">AnalyticsEvent</a></li><li><a href="Authorization.html">Authorization</a></li><li><a href="BasicAuthorization.html">BasicAuthorization</a></li><li><a href="BrowserPlatform.html">BrowserPlatform</a></li><li><a href="CordovaPlatform.html">CordovaPlatform</a></li><li><a href="CustomCode.html">CustomCode</a></li><li><a href="Diagnostics.html">Diagnostics</a></li><li><a href="FacebookAuthorization.html">FacebookAuthorization</a></li><li><a href="mcs.MobileBackendManager.html">mcs.MobileBackendManager</a></li><li><a href="MobileBackend.html">MobileBackend</a></li><li><a href="Notifications.html">Notifications</a></li><li><a href="OAuthAuthorization.html">OAuthAuthorization</a></li><li><a href="Platform.html">Platform</a></li><li><a href="SSOAuthorization.html">SSOAuthorization</a></li><li><a href="Storage.html">Storage</a></li><li><a href="StorageCollection.html">StorageCollection</a></li><li><a href="StorageObject.html">StorageObject</a></li><li><a href="User.html">User</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="global.html#IsInAppBrowserInstalled">IsInAppBrowserInstalled</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+	</div>
+</div>
+</div>
+
+
+<div class="container">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+			
+
+		<h1 class="page-title">Source: Storage/StorageCollection.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">"use strict";
+
+/**
+ * Class that holds the StorageCollection resource. StorageCollections contain Storage Objects
+ * which can be used to persist data in Mobile Cloud Service.
+ * @constructor
+ */
+function StorageCollection(data, userId, storage) {
+
+  var _storage = storage;
+  var _userId = mcs._Utils.validateConfiguration(userId);
+  var _data = data;
+
+  var storageCollection = this;
+
+  /**
+   * Returns storage object for current Storage Collection.
+   *
+   * @return Storage Object for current Storage Collection.
+   */
+  this.getStorage = function(){
+    return _storage;
+  };
+
+  /**
+   * Returns user id for current Storage Collection.
+   *
+   * @return user id for current Storage Collection.
+   */
+  this.getUserId = function(){
+    return _userId ;
+  };
+
+  /**
+   * Returns data for current Storage Collection.
+   *
+   * @return Storage Object data for current Storage Collection.
+   */
+  this.getData = function(){
+    return _data;
+  };
+
+  /**
+   * The ID of the StorageCollection.
+   * @type {String}
+   */
+  this.id = this.getData().id;
+
+  /**
+   * The description of the StorageCollection.
+   * @type {String}
+   */
+  this.description = this.getData().description;
+
+  this._userIsolated = this.getData().userIsolated;
+
+  /**
+   * Callback invoked after successfully fetching a StorageCollection.
+   * @callback StorageCollection~getObjectsSuccessCallback
+   * @param objects {Array} An array of StorageObjects downloaded from the service.
+   */
+
+  /**
+   * Callback invoked on error.
+   * @callback StorageCollection~errorCallback
+   * @param statusCode {Number} Any HTTP status code returned from the server, if available.
+   * @param message {String} The HTTP payload from the server, if available, or an error message.
+   */
+
+  /**
+   * Returns a list of Storage Objects from the collection starting from the offset and up to the limit. The service may return fewer objects.
+   * @param offset {Number} The offset at which to start. Must be greater than 0.
+   * @example offset: "3"
+   * @param limit {Number} The max number of Storage Objects to return. Must be non-negative.
+   * @example limit: "2"
+   * @param successCallback {StorageCollection~getObjectsSuccessCallback} Callback invoked on success.
+   * @param errorCallback {StorageCollection~errorCallback} Callback invoked on error.
+   */
+  this.getObjects = function(offset, limit, successCallback, errorCallback) {
+
+    var headers = storageCollection.getStorage().backend.getHttpHeaders();
+    headers["Accept"] = "application/json";
+    headers["Accept-Encoding"] = "gzip";
+
+    var url = "storage/collections/" + storageCollection.id + "/objects";
+
+    if(offset != null) {
+      url += url.indexOf("?") == -1 ? "?" : "&amp;";
+      url += "offset=" + offset;
+    }
+
+    if(limit != null) {
+      url += url.indexOf("?") == -1 ? "?" : "&amp;";
+      url += "limit=" + limit;
+    }
+    if(storageCollection.getUserId() != null &amp;&amp; storageCollection._userIsolated){
+      url += url.indexOf("?") == -1 ? "?" : "&amp;";
+      url += "user=" + storageCollection.getUserId();
+    }
+
+    mcs.MobileBackendManager.platform.invokeService({
+      method: 'GET',
+      url: storageCollection.getStorage().backend.getPlatformUrl(url),
+      headers: headers,
+
+      success: function(response, data) {
+        if(successCallback != null) {
+
+          var objects = [];
+          var objectsJson = data;
+          for(var i=0; i&lt;objectsJson.items.length; i++) {
+            objects[objects.length] = new mcs.StorageObject(storageCollection, objectsJson.items[i]);
+          }
+          successCallback(objects);
+        }
+      },
+      error: function(statusCode, data) {
+        if(errorCallback != null) {
+          errorCallback(statusCode, data);
+        }
+      }
+    });
+  };
+
+  /**
+   * Callback invoked after successfully fetching a StorageObject.
+   * @callback StorageCollection~storageObjectSuccessCallback
+   * @param object {StorageObject} The StorageObject downloaded from the service.
+   */
+
+  /**
+   * Returns a StorageObject given its ID. The contents of the object will be downloaded lazily.
+   * @example mcs.MobileBackend.Storage.StorageCollection.getObject(id,successCallback,errorCallback,objectType);
+   * @param id {String} The ID of the Storage Object to return.
+   * @example id: "00e39862-9652-458b-9a82-d1a66cf1a0c7"
+   * @param successCallback {StorageCollection~storageObjectSuccessCallback} Callback invoked on success.
+   * @param errorCallback {StorageCollection~errorCallback} Callback invoked on error.
+   * @param objectType {object} responseType for the XMLHttpRequest Object. Default response type if not defined is json.
+   * @example &lt;caption>Example usage of mcs.MobileBackend.Storage.StorageCollection.getObject("00e39862-9652-458b-9a82-d1a66cf1a0c7",successCallback,errorCallback,"blob")&lt;/caption>
+   *
+   * @example mcs.MobileBackend.Storage.StorageCollection.getObject("00e39862-9652-458b-9a82-d1a66cf1a0c7",successCallback,errorCallback,"blob");
+   * mcs.MobileBackend.Storage.StorageCollection.getObject("00e39862-9652-458b-9a82-d1a66cf1a0c7",
+   * function(statusCode, data){
+   * },
+   * function(statusCode, data){
+   * },
+   * 'blob'
+   * );
+   * // returns object as a blob on successCallback function from the data parameter.
+   *
+   * @example mcs.MobileBackend.Storage.StorageCollection.getObject("00e39862-9652-458b-9a82-d1a66cf1a0c7",successCallback,errorCallback,"arraybuffer");
+   * mcs.MobileBackend.Storage.StorageCollection.getObject("00e39862-9652-458b-9a82-d1a66cf1a0c7",
+   * function(statusCode, data){
+   * },
+   * function(statusCode, data){
+   * },
+   * 'arraybuffer'
+   * );
+   * // returns object as a arraybuffer on successCallback function from the data parameter.
+   *
+   * @example mcs.MobileBackend.Storage.StorageCollection.getObject("00e39862-9652-458b-9a82-d1a66cf1a0c7",successCallback,errorCallback,"document");
+   * mcs.MobileBackend.Storage.StorageCollection.getObject("00e39862-9652-458b-9a82-d1a66cf1a0c7",
+   * function(statusCode, data){
+   * },
+   * function(statusCode, data){
+   * },
+   * 'document'
+   * );
+   * // returns object as a document on successCallback function from the data parameter.
+   *
+   * @example mcs.MobileBackend.Storage.StorageCollection.getObject("00e39862-9652-458b-9a82-d1a66cf1a0c7",successCallback,errorCallback,"text");
+   * mcs.MobileBackend.Storage.StorageCollection.getObject("00e39862-9652-458b-9a82-d1a66cf1a0c7",
+   * function(statusCode, data){
+   * },
+   * function(statusCode, data){
+   * },
+   * 'text'
+   * );
+   * // returns object as text on successCallback function from the data parameter.
+   */
+
+  this.getObject = function(id, successCallback, errorCallback,objectType) {
+    var storageObject = new mcs.StorageObject(this);
+    storageObject.id = id;
+
+    storageObject.readPayload(function(statusCode) {
+      if(successCallback != null) {
+        successCallback(storageObject);
+      }
+    }, function(statusCode, data) {
+      if(errorCallback != null) {
+        errorCallback(statusCode, data);
+      }
+    },objectType);
+  };
+
+  /**
+   * Creates a new StorageObject in the collection.
+   * @param storageObject {StorageObject} The StorageObject to create.
+   * @example storageObject:
+   * {
+   * "id": " 213ddbac-ccb2-4a53-ad48-b4588244tc4c", // A service generated ID for the StorageObject. The ID is unique in the StorageCollection.
+   * "name" : "JSText.txt", // A user provided name for the StorageObject. A StorageCollection may have multiple StorageObjects with the same name.
+   * "contentLength": 798", // The length of data content in bytes stored in the StorageObject.
+   * "contentType" : "text/plain ", // The media-type associated with the StorageObject.
+   * "createdBy" : "DwainDRob", // The name of the user who created the StorageObject
+   * "createdOn": "Sat, 17 Oct 2015 10:33:12", // Server generated timestamp when the StorageObject was created.
+   * "modifiedBy": "DwainDRob", // The name of the user who last updated the StorageObject.
+   * "modifiedOn": "Sat, 17 Oct 2015 10:33:12" //  Server generated timestamp when the StorageObject was last updated.
+   * }
+   * @param successCallback {StorageCollection~storageObjectSuccessCallback} Callback invoked on success.
+   * @param errorCallback {StorageCollection~errorCallback} Callback invoked on error.
+   */
+  this.postObject = function(storageObject, successCallback, errorCallback) {
+    this._postOrPutStorageObject(storageObject, true, successCallback, errorCallback);
+  };
+
+  /**
+   * Updates an existing StorageObject in the collection.
+   * @param storageObject {StorageObject} The StorageObject to update.
+   * @param successCallback {StorageCollection~storageObjectSuccessCallback} Callback invoked on success.
+   * @param errorCallback {StorageCollection~errorCallback} Callback invoked on error.
+   */
+  this.putObject = function(storageObject, successCallback, errorCallback) {
+    this._postOrPutStorageObject(storageObject, false, successCallback, errorCallback);
+  };
+
+  this._postOrPutStorageObject = function(storageObject, isPost, successCallback, errorCallback) {
+
+    var headers = storageCollection.getStorage().backend.getHttpHeaders();
+    headers["Oracle-Mobile-Name"] = encodeURI(storageObject.getDisplayName());
+    headers["Accept-Encoding"] = "gzip";
+    headers["Content-Type"] = storageObject.contentType;
+    headers["Content-Length"] = storageObject.contentLength;
+
+
+    var url = "storage/collections/" + storageCollection.id + "/objects";
+    if(!isPost) {
+      url += "/" + storageObject.id;
+
+      if(storageObject._eTag != null) {
+        headers["If-Match"] = storageObject._eTag;
+      }
+    }
+
+    if(storageCollection._userIsolated &amp;&amp; storageCollection.getUserId() != null) {
+      url += "?user=" + storageCollection.getUserId();
+    }
+
+    mcs.MobileBackendManager.platform.invokeService({
+      method: isPost? 'POST' : 'PUT',
+      url: storageCollection.getStorage().backend.getPlatformUrl(url),
+      headers: headers,
+      body: storageObject.getPayload(),
+      success: function(response, data) {
+        if(successCallback != null) {
+          var object = new mcs.StorageObject(storageCollection,data);
+          successCallback(response.status,object);
+        }
+      },
+      error: function(statusCode, data) {
+        if(errorCallback != null) {
+          errorCallback(statusCode, data);
+        }
+      }
+    });
+  };
+
+  /**
+   * Callback invoked after a successful operation.
+   * @callback StorageCollection~storageCollectionSuccessCallback
+   */
+
+  /**
+   * Checks the service if a StorageObject with the given ID exists in the collection.
+   * @param id {String} The ID of the StorageObject to check.
+   * @example id: "00e394532-9652-458b-9a82-d1a47cf1a0c7"
+   * @param successCallback {StorageCollection~storageCollectionSuccessCallback} Callback invoked on success.
+   * @param errorCallback {StorageCollection~errorCallback} Callback invoked on error.
+   */
+  this.contains = function(id, successCallback, errorCallback) {
+    var headers = storageCollection.getStorage().backend.getHttpHeaders();
+
+    var url = "storage/collections/" + storageCollection.id + "/objects/" + id;
+    if(storageCollection._userIsolated &amp;&amp; storageCollection.getUserId() != null) {
+      url += "?user=" + storageCollection.getUserId();
+    }
+
+    mcs.MobileBackendManager.platform.invokeService({
+      method: "HEAD",
+      url: storageCollection.getStorage().backend.getPlatformUrl(url),
+      headers: headers,
+      success: function(response, data) {
+        if(successCallback != null) {
+          successCallback(response.status, data);
+        }
+      },
+      error: function(statusCode, data) {
+        if(errorCallback != null) {
+          errorCallback(statusCode, data);
+        }
+      }
+    });
+  };
+
+  /**
+   * Deletes a StorageObject from a collection.
+   * @param id {String} The ID of the StorageObject to delete.
+   * @example id: "00e394532-9652-458b-9a82-d1a47cf1a0c7"
+   * @param successCallback {StorageCollection~storageCollectionSuccessCallback} Callback invoked on success.
+   * @param errorCallback {StorageCollection~errorCallback} Callback invoked on error.
+   */
+  this.deleteObject = function(id, successCallback, errorCallback) {
+
+    var headers = storageCollection.getStorage().backend.getHttpHeaders();
+    headers["If-Match"] = "*";
+
+    var url = "storage/collections/" + storageCollection.id + "/objects/" + id;
+    if(storageCollection._userIsolated &amp;&amp; storageCollection.getUserId() != null) {
+      url += "?user=" + storageCollection.getUserId();
+    }
+
+    mcs.MobileBackendManager.platform.invokeService({
+      method: "DELETE",
+      url: storageCollection.getStorage().backend.getPlatformUrl(url),
+      headers: headers,
+      success: function(response, data) {
+        if(successCallback != null) {
+          successCallback(response.status, data);
+        }
+      },
+      error: function(statusCode, data) {
+        if(errorCallback != null) {
+          errorCallback(statusCode, data);
+        }
+      }
+    });
+  };
+}
+
+(function() {
+  var g = typeof window != 'undefined' ? window : global;
+
+  g.mcs = g.mcs || {};
+  g.mcs._StorageCollection = StorageCollection;
+}());
+</pre>
+    </article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+
+<footer>
+
+
+	<span class="copyright">
+	<center>Copyright &copy 2016, Oracle and/or its affiliates. All rights reserved.<center>
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+	on Thu Jun 23rd 2016 using the <a
+	href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<!--<script src="scripts/sunlight.js"></script>-->
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/bootstrap-dropdown.js"></script>
+<script src="scripts/toc.js"></script>
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
+		},
+		selectors   : "h1,h2,h3,h4",
+		showAndHide : false,
+                navbarOffset: 10,
+		smoothScrolling: true
+	} );
+
+	$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+	//			$( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
+
+  $( "table" ).each( function () {
+    var $this = $( this );
+    $this.addClass('table');
+  } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+</body>
+</html>

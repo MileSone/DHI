@@ -1,0 +1,21 @@
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<h3 style="text-align: center;padding-top: 22px;border-bottom: 1px solid gray;">Assets in my area</h3>
+   <div id='buttons-container' style="position: absolute;z-index: 300;width: 100%;">
+       <div style="float: right;margin-right: 18px;width: 200px;">
+        <input id="submit" type="submit" data-bind="click: getCurrentLocation, 
+                          ojComponent: {component: 'ojButton', label: 'Search with radius:(X00m)', chroming: 'full'},
+                          css: 'login-btn'"/>
+        <input id="inputnumber-id" style="visibility: inherit;width: 167px;"
+       data-bind="ojComponent: {
+        component: 'ojInputNumber', 
+        max:max,
+        min:min, 
+        step:step, 
+        value:currentValue}"/>    </div>
+    </div>
+    <div id="map" style="height:85vh"></div>
+

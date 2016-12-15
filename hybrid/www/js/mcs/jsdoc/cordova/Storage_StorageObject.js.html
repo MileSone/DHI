@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Oracle Mobile Cloud Service JavaScript SDK for Cordova Reference, Release: 16.2.3.0, E76063-01 Source: Storage/StorageObject.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.paper.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top navbar-inverse">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">Oracle Mobile Cloud Service JavaScript SDK for Cordova Reference, Release: 16.2.3.0, E76063-01</a>
+	</div>
+	<div class="navbar-collapse">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="mcs.html">mcs</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="Analytics.html">Analytics</a></li><li><a href="AnalyticsEvent.html">AnalyticsEvent</a></li><li><a href="Authorization.html">Authorization</a></li><li><a href="BasicAuthorization.html">BasicAuthorization</a></li><li><a href="BrowserPlatform.html">BrowserPlatform</a></li><li><a href="CordovaPlatform.html">CordovaPlatform</a></li><li><a href="CustomCode.html">CustomCode</a></li><li><a href="Diagnostics.html">Diagnostics</a></li><li><a href="FacebookAuthorization.html">FacebookAuthorization</a></li><li><a href="mcs.MobileBackendManager.html">mcs.MobileBackendManager</a></li><li><a href="MobileBackend.html">MobileBackend</a></li><li><a href="Notifications.html">Notifications</a></li><li><a href="OAuthAuthorization.html">OAuthAuthorization</a></li><li><a href="Platform.html">Platform</a></li><li><a href="SSOAuthorization.html">SSOAuthorization</a></li><li><a href="Storage.html">Storage</a></li><li><a href="StorageCollection.html">StorageCollection</a></li><li><a href="StorageObject.html">StorageObject</a></li><li><a href="User.html">User</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="global.html" class="dropdown-toggle" data-toggle="dropdown">Global<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="global.html#IsInAppBrowserInstalled">IsInAppBrowserInstalled</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+	</div>
+</div>
+</div>
+
+
+<div class="container">
+<div class="row">
+
+	
+	<div class="col-md-12">
+	
+		<div id="main">
+			
+
+		<h1 class="page-title">Source: Storage/StorageObject.js</h1>
+    
+<section>
+    <article>
+        <pre
+            class="sunlight-highlight-javascript linenums">"use strict";
+
+/**
+ * Class that represents a storage object resource that can be used to store data.
+ * @constructor
+ */
+function StorageObject(storageCollection, json) {
+
+   var _storageCollection = storageCollection;
+   var _payload = null;
+
+  if (json != null) {
+    /**
+     * A service generated ID for the StorageObject. The ID is unique in the StorageCollection.
+     * @type {String}
+     */
+    this.id = json.id;
+
+    /**
+     * A user provided name for the StorageObject. A StorageCollection may have multiple StorageObjects with the same name.
+     * @type {String}
+     */
+    this.name = json.name;
+
+    /**
+     * The length of data content in bytes stored in the StorageObject.
+     * @type {Number}
+     */
+    this.contentLength = json.contentLength;
+
+    /**
+     * The media-type associated with the StorageObject.
+     * @type {String}
+     */
+    this.contentType = json.contentType;
+
+    this._eTag = json.eTag;
+
+    /**
+     * The name of the user who created the StorageObject.
+     * @type {String}
+     */
+    this.createdBy = json.createdBy;
+
+    /**
+     * Server generated timestamp when the StorageObject was created.
+     * @type {String}
+     */
+    this.createdOn = json.createdOn;
+
+    /**
+     * The name of the user who last updated the StorageObject.
+     * @type {String}
+     */
+    this.modifiedBy = json.modifiedBy;
+
+    /**
+     * Server generated timestamp when the StorageObject was last updated.
+     * @type {String}
+     */
+    this.modifiedOn = json.modifiedOn;
+  }
+
+  /**
+   * Returns the current Storage Object Payload.
+   *
+   * @return Current Storage object payload.
+   */
+  this.getPayload = function(){
+    return _payload;
+  };
+
+
+  /**
+   * Sets the payload for Storage Object.
+   *
+   * @param payload The payload to be associated with Storage Object.
+   */
+  this.setPayload =function(payload){
+    _payload = payload;
+  };
+
+  /**
+   * Returns the current Storage Collection.
+   *
+   * @return Current Storage Collection.
+   */
+  this.getstorageCollection = function(){
+    return _storageCollection;
+  };
+
+  /**
+   * Returns the current Storage Object.
+   *
+   * @return Current Storage Object.
+   */
+  this.getStorage = function(){
+    return this.getstorageCollection()._storage
+  };
+
+  /**
+   * Loads a StorageObject's contents from an object.
+   * @param payload {Object} The object to load from.
+   * @example payload: "Hello my name is Mia and this is a sample payload".
+   * @param contentType {String} The media-type to associate with the content.
+   * @example contentType: "application/json,text/plain".
+   */
+  this.loadPayload = function(payload, contentType) {
+
+    _payload = payload;
+    this.contentType = contentType;
+
+    if(this.contentType == 'text/plain'){
+      if(typeof _payload == "string") {
+        _payload = payload;
+      }
+    }
+    else if(this.contentType == 'application/json'){
+      if(typeof _payload == "string"){
+        _payload = payload;
+      }
+      else if(typeof _payload == "object"){
+        _payload = JSON.stringify(payload);
+      }
+    }
+    this.contentLength = _payload.length;
+  };
+  /**
+   * Sets a StorageObject's display name from an object.
+   * @param name {Object} The object's name to be associated with the object.
+   * @example name: "JSFile中国人.txt"
+   * @returns The object's name in UTC-8 ASCII format.
+   */
+  this.setDisplayName = function(name){
+    this.name = name;
+  };
+
+  /**
+   * Returns a StorageObject's display name from an object.
+   *
+   * @returns String object's name decoded if encoded into the MobileBackend.
+   */
+  this.getDisplayName = function(){
+    return this.name;
+  };
+
+
+  /**
+   * Callback invoked after successfully downloading data from the StorageObject.
+   * @callback StorageObject~readPayloadSuccessCallback
+   * @param statusCode {Number} Any HTTP status code returned from the server, if available.
+   * @param mobileObject {Object} The downloaded data.
+   */
+
+  /**
+   * Callback invoked on error.
+   * @callback StorageObject~errorCallback
+   * @param statusCode {Number} Any HTTP status code returned from the server, if available.
+   * @param message {String} The HTTP payload from the server, if available, or an error message.
+   */
+
+  /**
+   * Returns the contents of the StorageObject. May result in a download from the service if the contents were not
+   * previously downloaded.
+   * @param successCallback {StorageObject~readPayloadSuccessCallback} Callback invoked on success.
+   * @param errorCallback {StorageObject~errorCallback} Callback invoked on error.
+   * @param objectType responseType for the XMLHttpRequest Object.
+   */
+  this.readPayload = function(successCallback, errorCallback,objectType) {
+    if(this.getPayload() == null) {
+
+      var storageObject = this;
+
+      var headers = storageObject.getstorageCollection().getStorage().backend.getHttpHeaders();
+      headers["Accept-Encoding"] = "gzip";
+
+      var url = "storage/collections/" + storageObject.getstorageCollection().id + "/objects/" + this.id;
+
+      if(storageObject.getstorageCollection().userId != null &amp;&amp; storageObject.getstorageCollection()._userIsolated){
+        url += "?user=" + storageObject.getstorageCollection().userId;
+      }
+
+      mcs.MobileBackendManager.platform.invokeService({
+        method: 'GET',
+        url: storageObject.getstorageCollection().getStorage().backend.getPlatformUrl(url),
+        headers: headers,
+        responseType: objectType || "blob",
+
+        success: function (response,data) {
+          invokeServiceSuccess(response,data,storageObject,successCallback)
+        },
+        error: function(statusCode, data) {
+          invokeServiceError(statusCode,data,errorCallback)
+        }
+      });
+    }
+  };
+
+  function invokeServiceSuccess (response, data,storageObject, successCallback) {
+    if(successCallback != null){
+      storageObject.setPayload(data);
+      storageObject.name = decodeURI(response.getResponseHeader("Oracle-Mobile-Name"));
+      storageObject._eTag = response.getResponseHeader("ETag");
+      storageObject.contentLength = data.size;
+      storageObject.contentType = response.getResponseHeader("Content-Type");
+      storageObject.createdBy = response.getResponseHeader("Oracle-Mobile-Created-By");
+      storageObject.createdOn = response.getResponseHeader("Oracle-Mobile-Created-On");
+      storageObject.modifiedBy = response.getResponseHeader("Oracle-Mobile-Modified-By");
+      storageObject.modifiedOn = response.getResponseHeader("Oracle-Mobile-Modified-On");
+      successCallback(storageObject);
+    }
+  }
+
+  function invokeServiceError(statusCode,data,errorCallback){
+    if(errorCallback != null) {
+      errorCallback(statusCode, data);
+    }
+  }
+}
+
+(function() {
+  var g = typeof window != 'undefined' ? window : global;
+
+  g.mcs = g.mcs || {};
+  g.mcs.StorageObject = StorageObject;
+}());
+</pre>
+    </article>
+</section>
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+
+</div>
+</div>
+
+
+<footer>
+
+
+	<span class="copyright">
+	<center>Copyright &copy 2016, Oracle and/or its affiliates. All rights reserved.<center>
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+	on Thu Jun 23rd 2016 using the <a
+	href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<!--<script src="scripts/sunlight.js"></script>-->
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/bootstrap-dropdown.js"></script>
+<script src="scripts/toc.js"></script>
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
+		},
+		selectors   : "h1,h2,h3,h4",
+		showAndHide : false,
+                navbarOffset: 10,
+		smoothScrolling: true
+	} );
+
+	$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+	//			$( ".tutorial-section pre, .readme-section pre" ).addClass( "sunlight-highlight-javascript" ).addClass( "linenums" );
+
+  $( "table" ).each( function () {
+    var $this = $( this );
+    $this.addClass('table');
+  } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+</body>
+</html>

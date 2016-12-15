@@ -1,0 +1,25 @@
+{
+  "mobileBackends": {
+    "LocationDemo": {
+      "baseUrl": "https://apacdemo2-apacdemo2.mobileenv.us2.oraclecloud.com:443",
+      "applicationKey": "2078c283-44a4-4e3e-96b9-98c9191fc4e2",
+      "authorization": {
+        "basicAuth": {
+          "backendId": "8843fef3-f491-499f-9527-6a8079f2c438",
+          "anonymousToken": "QVBBQ0RFTU8yX0FQQUNERU1PMl9NT0JJTEVfQU5PTllNT1VTX0FQUElEOnZva3AzaWJhamdNMC5l"
+        },
+        "oAuth": {
+          "clientId": "YOUR_CLIENT_ID",
+          "clientSecret": "YOUR_ClIENT_SECRET",
+          "tokenEndpoint": "YOUR_TOKEN_ENDPOINT"
+        },
+        "facebookAuth":{
+          "facebookAppId": "YOUR_FACEBOOK_APP_ID"
+        },
+        "ssoAuth":{
+          "tokenEndpoint": "YOUR_SSO_TOKEN_ENDPOINT"
+        }
+      }
+    }
+  }
+}

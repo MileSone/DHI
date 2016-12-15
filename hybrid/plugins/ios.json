@@ -1,0 +1,28 @@
+{
+    "prepare_queue": {
+        "installed": [],
+        "uninstalled": []
+    },
+    "config_munge": {
+        "files": {}
+    },
+    "installed_plugins": {
+        "cordova-plugin-camera": {
+            "PACKAGE_NAME": "com.oraclecorp.internal.ent3.xh.QADemo"
+        },
+        "cordova-plugin-file": {
+            "PACKAGE_NAME": "com.oraclecorp.internal.ent3.xh.QADemo"
+        },
+        "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "com.oraclecorp.internal.ent3.xh.QADemo"
+        },
+        "com.unarin.cordova.beacon": {
+            "PACKAGE_NAME": "com.oraclecorp.internal.ent3.xh.QADemo"
+        }
+    },
+    "dependent_plugins": {
+        "cordova-plugin-compat": {
+            "PACKAGE_NAME": "com.oraclecorp.internal.ent3.xh.QADemo"
+        }
+    }
+}

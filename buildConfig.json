@@ -1,0 +1,24 @@
+{
+    "ios": {
+        "debug": {
+            "codeSignIdentity": "iPhone Developer: xinghong918@163.com (RTRE79N43Y)",
+            "provisioningProfile": "700fdecb-8a4f-4fcf-9abf-273d2af20c04"
+        },
+        "release": {
+            "codeSignIdentity": "iPhone Distribution: Oracle Corporation (Ent 3)",
+            "provisioningProfile": "3b853f9c-7663-4f48-8831-cf629908f8c6"
+        }
+    },
+    "android": {
+        "debug": {
+        },
+        "release": {
+            "keystore": "cathy-release-key.keystore",
+            "storePassword": "welcome1",
+            "alias": "releaseKeyAlias",
+            "password" : "welcome1",
+            "keystoreType": ""
+        }
+    }
+}
+

@@ -7,8 +7,8 @@
 /**
  * beacon module
  */
-define(['ojs/ojcore', 'knockout', 'jquery', 'mbe/mbe', 'ojs/ojknockout', 'ojs/ojbutton', 'ojs/ojinputtext', 'ojs/ojswitch'
-], function (oj, ko, $, mbe) {
+define(['ojs/ojcore', 'knockout', 'jquery', 'hammerjs', 'mbe/mbe', 'ojs/ojjquery-hammer', 'ojs/ojoffcanvas', 'ojs/ojknockout', 'ojs/ojbutton', 'ojs/ojinputtext', 'ojs/ojswitch', 'ojs/ojlistview', 'ojs/ojarraytabledatasource'
+], function (oj, ko, $, Hammer, mbe) {
     /**
      * The view model for the main content view template
      */
@@ -26,6 +26,12 @@ define(['ojs/ojcore', 'knockout', 'jquery', 'mbe/mbe', 'ojs/ojknockout', 'ojs/oj
         self.beaconRegionArr = [];  // beacon options
         self.beaconRegions = [];
 
+        this.allItems = ko.observableArray([{"item": "Milk",'date':'111'}
+                                           ]);
+        this.hisselectedItems = ko.observableArray([]);
+        var lastItemId = this.allItems().length;
+        this.hisdataSource = new oj.ArrayTableDataSource(this.allItems, {});
+        var tempBeaconItem;
 
         self.map;
         var marker;
@@ -34,7 +40,7 @@ define(['ojs/ojcore', 'knockout', 'jquery', 'mbe/mbe', 'ojs/ojknockout', 'ojs/oj
 
         var stop = null;
         var centerd = null;
-      
+
 
 
         self.save = function () {
@@ -53,11 +59,11 @@ define(['ojs/ojcore', 'knockout', 'jquery', 'mbe/mbe', 'ojs/ojknockout', 'ojs/oj
             }
         };
 
-            self.handleDetached = function (info) {
+        self.handleDetached = function (info) {
 
             stop = 1;
         };
-        
+
         self.startMonitoring = function () {
             self.message("booting...");
             if (self.manualYN())
@@ -93,16 +99,25 @@ define(['ojs/ojcore', 'knockout', 'jquery', 'mbe/mbe', 'ojs/ojknockout', 'ojs/oj
 
             delegate.didExitRegion = function (pluginResult) {
                 console.log("didExitRegion: " + JSON.stringify(pluginResult));
-                self.message("left Beacon area！");
-                alert("Bye~");
+
+                var alertMess = pluginResult.region.identifier + " has left the gate.";
+                self.message(alertMess);
+                alert(alertMess);
             };
 
             /*
              * didEnterRegion: {"eventType":"didEnterRegion","region":{"identifier":"Desay iBeacon","uuid":"fda50693-a4e2-4fb1-afcf-c6eb07647825","major":"10004","minor":"5178","typeName":"BeaconRegion"}}
              */
             delegate.didEnterRegion = function (pluginResult) {
+
+                var testJson = {"eventType": "didEnterRegion", "region": {"identifier": "Desay iBeacon", "uuid": "fda50693-a4e2-4fb1-afcf-c6eb07647825", "major": "10004", "minor": "5178", "typeName": "BeaconRegion"}};
                 console.log("didEnterRegion: " + JSON.stringify(pluginResult));
-                self.message("entering Beacon area...");
+                var alertMess;
+                if (null !== pluginResult.region.identifier) {
+                    alertMess = pluginResult.region.identifier;
+                }
+
+                self.message(alertMess + " passing the Gate...");
                 for (var i = 0; i < self.beaconRegionArr.length; i++)
                 {
                     var it = self.beaconRegionArr[i];
@@ -110,24 +125,18 @@ define(['ojs/ojcore', 'knockout', 'jquery', 'mbe/mbe', 'ojs/ojknockout', 'ojs/oj
                             (it.major.toString() === pluginResult.region.major.toString()) &&
                             (it.minor.toString() === pluginResult.region.minor.toString()))
                     {
-                        alert(it.text);
-                        cordova.plugins.notification.local.schedule({
-                            title: it.title,
-                            text: it.text,
-                            data: {type: "beacon"}
-                        });
-                        cordova.plugins.notification.local.on("click", function (notification) {
-                            //    console.log(notification.data.type);
-                        });
+                        var today = new Date();
+                        var aBeaconItem = {'item': pluginResult.region.identifier, 'date': today};
+                        this.allItems.push(aBeaconItem);
+//                        self.hisdataSource(new oj.ArrayTableDataSource(this.allItems, {}));
                         navigator.vibrate(2000);
                         break;
                     }
                 }
-
             };
 
             cordova.plugins.locationManager.setDelegate(delegate);
-            
+
             // required in iOS 8+
             if (window.cordova.platformId === 'ios') {
                 cordova.plugins.locationManager.requestAlwaysAuthorization();
@@ -145,7 +154,7 @@ define(['ojs/ojcore', 'knockout', 'jquery', 'mbe/mbe', 'ojs/ojknockout', 'ojs/oj
                         .fail(console.error)
                         .done();
             }
-            self.message("data："+self.beaconRegions.length);
+            self.message("data：" + self.beaconRegions.length);
         };
 
         self.stopMonitoring = function () {
@@ -158,7 +167,7 @@ define(['ojs/ojcore', 'knockout', 'jquery', 'mbe/mbe', 'ojs/ojknockout', 'ojs/oj
                         })
                         .done();
             }
-            self.message("Stop！");
+            self.message("Beacon off");
         };
 
         function findBeacon(beaconObj)
@@ -225,15 +234,8 @@ define(['ojs/ojcore', 'knockout', 'jquery', 'mbe/mbe', 'ojs/ojknockout', 'ojs/oj
             //    self.startMonitoring();
         }
 
-
         function init() {
-            
             initMap();
-            
-            
-            
-            
-            
             getAllBeacons().then(initModule, initModule);
             $("#switch").ojSwitch({
                 'optionChange': function (event, data) {
@@ -248,14 +250,12 @@ define(['ojs/ojcore', 'knockout', 'jquery', 'mbe/mbe', 'ojs/ojknockout', 'ojs/oj
                 }
             });
         }
-        
-        
-        
+
         function initMap() {
             self.map = new google.maps.Map(document.getElementById('map3'), {
                 center: {
-                    lat: 38.887733,
-                    lng: 121.549099
+                    lat: 37.503808,
+                    lng: 127.024075
                 },
                 gestureHandling: 'greedy',
                 fullscreenControl: true,
@@ -275,8 +275,8 @@ define(['ojs/ojcore', 'knockout', 'jquery', 'mbe/mbe', 'ojs/ojknockout', 'ojs/oj
             runnableGetLocation();
         }
         ;
-        
-        
+
+
         self.getCurrentLocation = function () {
             //Tracking users position
             var options = {
@@ -285,7 +285,7 @@ define(['ojs/ojcore', 'knockout', 'jquery', 'mbe/mbe', 'ojs/ojknockout', 'ojs/oj
                 maximumAge: 0
             };
 
-            // Try HTML5 geolocation.
+//            // Try HTML5 geolocation.
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(self.getCurrentLocationSuccess, self.getCurrentLocationError, options);
             } else {
@@ -308,7 +308,6 @@ define(['ojs/ojcore', 'knockout', 'jquery', 'mbe/mbe', 'ojs/ojknockout', 'ojs/oj
                 lat: position.coords.latitude + 0.00059,
                 lng: position.coords.longitude + 0.004332
             };
-
 
             // Create marker 
             marker = new google.maps.Marker({
@@ -347,11 +346,57 @@ define(['ojs/ojcore', 'knockout', 'jquery', 'mbe/mbe', 'ojs/ojknockout', 'ojs/oj
         };
 
         self.getCurrentLocationError = function (error) {
-            console.log('get current location fail.');
+            console.log('get current location fail.' + error);
             //    self.map.setZoom(15);
             //    self.map.setCenter({lat: 25.038638111097974, lng: 121.55573844909668});
             //  handleLocationError(true, infoWindow, map.getCenter());
         };
+
+
+        this.drawer =
+                {
+                    "displayMode": "push",
+                    "selector": "#drawer",
+                    "content": "#main"
+                };
+
+        this.toggleDrawer = function ()
+        {
+            return oj.OffcanvasUtils.toggle(this.drawer);
+        };
+
+        this.openDrawer = function ()
+        {
+            return oj.OffcanvasUtils.open(this.drawer);
+        };
+
+
+        this.isRTL = function ()
+        {
+            var dir = document.documentElement.getAttribute("dir");
+            if (dir)
+                dir = dir.toLowerCase();
+            return (dir === "rtl");
+        };
+
+        //use hammer for swipe
+        var mOptions = {
+            "recognizers": [
+                [Hammer.Swipe, {"direction": Hammer["DIRECTION_HORIZONTAL"]}]
+            ]};
+
+        $("#main")
+                .ojHammer(mOptions)
+                .on("swipeleft", function (event) {
+                    event.preventDefault();
+                    if (self.isRTL())
+                        self.openDrawer();
+                })
+                .on("swiperight", function (event) {
+                    event.preventDefault();
+                    if (!self.isRTL())
+                        self.openDrawer();
+                });
     }
 
     return new beaconContentViewModel();

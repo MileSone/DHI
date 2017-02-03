@@ -10,45 +10,91 @@ and open the template in the editor.
     </div>
 </div>
 <div id="map2" style="height:85vh"></div>-->
-<div class="oj-hybrid-padding" data-bind="visible: loadReady" >
-        <span style="text-align: center;padding-top: 22px;color: black;    display: block;">Beacon enable： <input id="switch" data-bind="ojComponent: {component: 'ojSwitch', 
+
+<div id="main" class=" oj-hybrid-padding mui-off-canvas-wrap mui-draggable"  data-bind="visible: loadReady">
+
+    
+
+    
+    <span style="padding-top: 22px;color: black;">Beacon enable： <input id="switch" data-bind="ojComponent: {component: 'ojSwitch', 
 				value: isChecked}"/>
-            &nbsp;&nbsp;<strong data-bind="text: (isChecked()) ? 'yes' : 'no'"></strong></span>
+        &nbsp;&nbsp;<strong data-bind="text: (isChecked()) ? 'ON' : 'OFF'"></strong></span>
+    <span><button style="position: fixed;right: 22px;" data-bind="click: openDrawer,
+                         ojComponent: {component:'ojButton', 
+                         label: 'Toggle start offcanvas', 
+                         chroming: 'half',
+                         display: 'icons', 
+                         icons: {start: 'oj-fwk-icon-hamburger oj-fwk-icon'}}">
+      </button>
+        </span>
     <br/>
-    <div>
+    
+    
+    
+    <div style="text-align: center;">
         <span data-bind="text: message"></span>
     </div>
-</div>
 
-<div  data-bind="visible: manualYN" class="oj-hybrid-padding">
-    <div>
-        <label for="senderId">UUID: </label>
-        <input id="uuid" 
-               type="text"
-               data-bind="ojComponent: {component: 'ojInputText', 
+
+    <div  data-bind="visible: manualYN" class="oj-hybrid-padding">
+        <div>
+            <label for="senderId">UUID: </label>
+            <input id="uuid" 
+                   type="text"
+                   data-bind="ojComponent: {component: 'ojInputText', 
                                   value: uuid}"/>
-        <hr/>
-        <label for="senderId">Major: </label>
-        <input id="major" 
-               type="text"
-               data-bind="ojComponent: {component: 'ojInputText', 
+            <hr/>
+            <label for="senderId">Major: </label>
+            <input id="major" 
+                   type="text"
+                   data-bind="ojComponent: {component: 'ojInputText', 
                                   value: major}"/>
 
-        <label for="senderId">Minor: </label>
-        <input id="minor" 
-               type="text"
-               data-bind="ojComponent: {component: 'ojInputText', 
+            <label for="senderId">Minor: </label>
+            <input id="minor" 
+                   type="text"
+                   data-bind="ojComponent: {component: 'ojInputText', 
                                   value: minor}"/>
-    </div>
-    <div>
-        <input id="submit" type="submit" 
-               data-bind="click: save, 
+        </div>
+        <div>
+            <input id="submit" type="submit" 
+                   data-bind="click: save, 
                     ojComponent: {component: 'ojButton', label: 'Save setting', chroming: 'full'}
-               "/>
+                   "/>
+        </div>
     </div>
+    <hr/>
+    <div id="map3" style="height:85vh"></div>
 </div>
-<hr/>
-<div id="map3" style="height:85vh"></div>
+
+    <div id="drawer" 
+         class="oj-offcanvas-end oj-panel oj-panel-alt5" 
+         style="width: 220px;background-color: white;">
+        <button style="position: fixed;right: 22px;" data-bind="click: toggleDrawer,
+                         ojComponent: {component:'ojButton', 
+                         label: 'Toggle start offcanvas', 
+                         chroming: 'half',
+                         display: 'icons', 
+                         icons: {start: 'oj-panel-remove-icon oj-panel-remove-icon'}}">
+        </button>
+      
+      <div style="margin: 0 auto; margin-top: 30px; width: 80px;height: 54px;content: url('img/track.png');"></div><div style="color: black;padding-bottom: 20px;text-align: center">History List</div>
+      <ul id="hislistview" aria-label="list using observable array" 
+        data-bind="ojComponent: {
+            component: 'ojListView', 
+            data: hisdataSource, 
+            selectionMode: 'multiple',
+            selection: hisselectedItems,
+            item: 
+            {
+                renderer: function(context)
+                {
+                    return context['data']['item'] + context['data']['date'];
+                }
+            }
+        }">
+    </ul>
+    </div>
 <!--
 <div data-bind="visible: loadReady" class="oj-hybrid-padding">
     <input id="submit" type="submit" 

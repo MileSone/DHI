@@ -28,7 +28,7 @@ requirejs.config(
                                 'signals': 'libs/js-signals/signals',
                                 'mcs': 'mcs/mcs',
                                 'mcs_config': 'mcs/oracle_mobile_cloud_config',
-                                'geometry': 'http://maps.googleapis.com/maps/api/js?key=AIzaSyDXJNvjUhtIOb5ldffE796Sf0iOgkRO4FI'
+                                'geometry': 'http://maps.googleapis.com/maps/api/js?key=AIzaSyA51CV-g_oeJl8JpsBBm1RxM5LvmJaYj6M'
                             },
                     // Shim configurations for modules that do not expose AMD
                     shim:

@@ -14007,4 +14007,30 @@ and open the template in the editor.
 .grid-item { width: 200px; }
 .grid-item--width2 { width: 400px; }
 
+span.mui-icon {
+    font-size: 14px;
+    color: #007aff;
+    margin-left: -15px;
+    padding-right: 10px;
+}
+.mui-off-canvas-right {
+    color: #fff;
+}
+.title {
+    margin: 35px 15px 10px;
+}
+.title+.content {
+    margin: 10px 15px 35px;
+    color: #bbb;
+    text-indent: 1em;
+    font-size: 14px;
+    line-height: 24px;
+}
+
+.truckDiv{
+    width:60px;
+    height:60px;
+    background: url("../img/track.png");
+}
+
 /*# sourceMappingURL=style.css.map */

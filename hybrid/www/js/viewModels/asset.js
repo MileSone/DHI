@@ -224,8 +224,10 @@ define(['ojs/ojcore', 'knockout', 'jquery', 'mbe/mbe', 'ojs/ojknockout', 'ojs/oj
         function initMap() {
             self.map = new google.maps.Map(document.getElementById('map2'), {
                 center: {
-                    lat: 38.887733,
-                    lng: 121.549099
+//                    lat: 38.887733,
+//                    lng: 121.549099
+                    lat: 37.503808,
+                    lng: 127.024075
                 },
                 gestureHandling: 'greedy',
                 fullscreenControl: true,

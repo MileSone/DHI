@@ -82,7 +82,7 @@ define(['ojs/ojcore', 'knockout', 'jquery', 'mbe/mbe', 'ojs/ojknockout', 'ojs/oj
             }
 
             function errorCallback(status, data) {
-                console.log("Load placess from MCS fail! " + status + ': ' + JSON.stringify(data));
+//                console.log("Load placess from MCS fail! " + status + ': ' + JSON.stringify(data));
                 deferred.reject(status, data);
             }
 

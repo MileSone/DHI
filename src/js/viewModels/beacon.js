@@ -205,7 +205,7 @@ define(['ojs/ojcore', 'knockout', 'jquery', 'hammerjs', 'mbe/mbe', 'ojs/ojjquery
             }
 
             function errorCallback(status, data) {
-                console.log("Load devices from MCS fail! " + status + ': ' + JSON.stringify(data));
+//                console.log("Load devices from MCS fail! " + status + ': ' + JSON.stringify(data));
                 self.loadReady(true);
                 self.manualYN(false);
                 deferred.reject(status, data);
